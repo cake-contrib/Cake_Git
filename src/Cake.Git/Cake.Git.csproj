@@ -52,16 +52,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GitAliases.Checkout.cs" />
+    <Compile Include="Extensions\RepositoryExtensions.cs" />
+    <Compile Include="GitAliases.Add.cs" />
+    <Compile Include="GitAliases.Clone.cs" />
+    <Compile Include="Extensions\PathExtensions.cs" />
+    <Compile Include="GitAliases.Commit.cs" />
     <Compile Include="GitAliases.cs" />
+    <Compile Include="GitAliases.Init.cs" />
+    <Compile Include="GitCommit.cs" />
+    <Compile Include="GitSignature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Namespaces.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="GitAliases.Remove.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
