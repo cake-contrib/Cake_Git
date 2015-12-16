@@ -1,0 +1,66 @@
+﻿using System;
+using Cake.Core;
+using Cake.Core.Annotations;
+using Cake.Core.IO;
+using Cake.Git.Extensions;
+using LibGit2Sharp;
+
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+namespace Cake.Git
+{
+    public static partial class GitAliases
+    {
+        /// <summary>
+        /// Checkout file(s) using supplied commit or branch spec.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Path to repository.</param>
+        /// <param name="committishOrBranchSpec">A revparse spec for the commit or branch to checkout paths from.</param>
+        /// <param name="filePaths">Path to files to checkout.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Checkout")]
+        public static void GitCheckout(this ICakeContext context, DirectoryPath repositoryDirectoryPath,
+            string committishOrBranchSpec, params FilePath[] filePaths)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (string.IsNullOrWhiteSpace(committishOrBranchSpec))
+            {
+                throw new ArgumentNullException(nameof(committishOrBranchSpec));
+            }
+
+            if (repositoryDirectoryPath == null)
+            {
+                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
+            }
+
+            context.UseRepository(
+                repositoryDirectoryPath,
+                repository => repository.CheckoutPaths(
+                    committishOrBranchSpec,
+                    filePaths.ToRelativePathStrings(context, repositoryDirectoryPath),
+                    new CheckoutOptions { CheckoutModifiers = CheckoutModifiers.Force }
+                    )
+                );
+        }
+
+        /// <summary>
+        /// Checkout file.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Path to repository.</param>
+        /// <param name="filePaths">Path to files to remove.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Checkout")]
+        public static void GitCheckout(this ICakeContext context, DirectoryPath repositoryDirectoryPath, params FilePath[] filePaths)
+        {
+            context.GitCheckout(repositoryDirectoryPath, "HEAD", filePaths);
+        }
+    }
+}

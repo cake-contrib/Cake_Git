@@ -1,0 +1,9 @@
+# Operating system (build VM template)
+os: Visual Studio 2015
+
+# Build script
+build_script:
+  - ps: .\build.ps1 -Target AppVeyor
+
+# Tests
+test: off
