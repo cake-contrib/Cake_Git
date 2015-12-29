@@ -9,6 +9,7 @@ using LibGit2Sharp;
 // ReSharper disable UnusedMember.Global
 namespace Cake.Git
 {
+    // ReSharper disable once PublicMembersMustHaveComments
     public static partial class GitAliases
     {
         /// <summary>
@@ -21,8 +22,12 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Checkout")]
-        public static void GitCheckout(this ICakeContext context, DirectoryPath repositoryDirectoryPath,
-            string committishOrBranchSpec, params FilePath[] filePaths)
+        public static void GitCheckout(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            string committishOrBranchSpec,
+            params FilePath[] filePaths
+            )
         {
             if (context == null)
             {
@@ -58,7 +63,11 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Checkout")]
-        public static void GitCheckout(this ICakeContext context, DirectoryPath repositoryDirectoryPath, params FilePath[] filePaths)
+        public static void GitCheckout(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            params FilePath[] filePaths
+            )
         {
             context.GitCheckout(repositoryDirectoryPath, "HEAD", filePaths);
         }

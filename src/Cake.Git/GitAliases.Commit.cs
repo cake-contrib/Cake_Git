@@ -10,6 +10,7 @@ using LibGit2Sharp;
 
 namespace Cake.Git
 {
+    // ReSharper disable once PublicMembersMustHaveComments
     public static partial class GitAliases
     {
         /// <summary>
@@ -42,7 +43,6 @@ namespace Cake.Git
             {
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
-
 
             return context.UseRepository(
                 repositoryDirectoryPath,

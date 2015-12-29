@@ -9,6 +9,7 @@ using LibGit2Sharp;
 // ReSharper disable UnusedMember.Global
 namespace Cake.Git
 {
+    // ReSharper disable once PublicMembersMustHaveComments
     public static partial class GitAliases
     {
         /// <summary>

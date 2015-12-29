@@ -9,6 +9,7 @@ using LibGit2Sharp;
 // ReSharper disable UnusedMember.Global
 namespace Cake.Git
 {
+    // ReSharper disable once PublicMembersMustHaveComments
     public static partial class GitAliases
     {
         /// <summary>
@@ -21,7 +22,12 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Remove")]
-        public static void GitRemove(this ICakeContext context, DirectoryPath repositoryDirectoryPath, bool removeFromWorkingDirectory, params FilePath[] filePaths)
+        public static void GitRemove(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            bool removeFromWorkingDirectory,
+            params FilePath[] filePaths
+            )
         {
             if (context == null)
             {

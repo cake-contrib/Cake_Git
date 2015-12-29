@@ -19,7 +19,11 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Add")]
-        public static void GitAdd(this ICakeContext context, DirectoryPath repositoryDirectoryPath, params FilePath[] filePaths)
+        public static void GitAdd(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            params FilePath[] filePaths
+            )
         {
             if (context == null)
             {
