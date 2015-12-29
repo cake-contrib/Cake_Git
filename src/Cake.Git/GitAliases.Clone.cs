@@ -13,7 +13,7 @@ namespace Cake.Git
     public static partial class GitAliases
     {
         /// <summary>
-        /// Clone using default options.
+        /// Clone unauthenticated using default options.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="sourceUrl">URI for the remote repository.</param>
@@ -54,7 +54,7 @@ namespace Cake.Git
         }
 
         /// <summary>
-        /// Clone using specified options.
+        /// Clone authenticated using default options.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="sourceUrl">URI for the remote repository.</param>

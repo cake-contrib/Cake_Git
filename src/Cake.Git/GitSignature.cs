@@ -7,7 +7,7 @@ namespace Cake.Git
     /// <summary>
     /// Git Commit Author / Committer.
     /// </summary>
-    public class GitSignature
+    public sealed class GitSignature
     {
         /// <summary>
         /// Email address of author / committer.
