@@ -60,6 +60,7 @@
     <Compile Include="GitAliases.Commit.cs" />
     <Compile Include="GitAliases.cs" />
     <Compile Include="GitAliases.Init.cs" />
+    <Compile Include="GitAliases.Log.cs" />
     <Compile Include="GitAliases.Pull.cs" />
     <Compile Include="GitAliases.Push.cs" />
     <Compile Include="GitCommit.cs" />
