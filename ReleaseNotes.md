@@ -1,3 +1,6 @@
+### New in 0.1.0 (Released 2016/04/18)
+* Inital Release
+* Updated LibGit to 0.22 stable
 ### New in 0.0.3 (Released 2016/01/31)
 * Added more Git push/pull/log
 ### New in 0.0.2 (Released 2015/12/14)
