@@ -10,6 +10,11 @@ namespace Cake.Git
     public sealed class GitCommit
     {
         /// <summary>
+        /// Commit Id for bare repository
+        /// </summary>
+        public const string RootCommit = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+
+        /// <summary>
         /// Sha Id of commit.
         /// </summary>
         public string Sha { get; }
@@ -33,6 +38,15 @@ namespace Cake.Git
         /// Commit short message.
         /// </summary>
         public string MessageShort { get; }
+
+        /// <summary>
+        /// Generates a string representation of <see cref="GitCommit"/>
+        /// </summary>
+        /// <returns><see cref="GitCommit"/> as string</returns>
+        public override string ToString()
+        {
+            return $"Sha: {Sha}, Author: {{{Author}}}, Committer: {{{Committer}}}, Message: {Message}, MessageShort: {MessageShort}";
+        }
 
         internal GitCommit(Commit commit)
         {

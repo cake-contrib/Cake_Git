@@ -1,3 +1,10 @@
+### New in 0.2.0 (Released 2016/04/22)
+* Added GittDiff alias
+* Fixed documentatio typos
+* Fixed GitLog bugg
+* Added Git Commit / Author ToString() overrides
+* Removed unused attributes
+* Added test.cake script
 ### New in 0.1.0 (Released 2016/04/18)
 * Inital Release
 * Updated LibGit to 0.22 stable

@@ -160,9 +160,17 @@ Task("Build")
     }
 });
 
+Task("Test")
+    .IsDependentOn("Build")
+    .WithCriteria(() => StringComparer.OrdinalIgnoreCase.Equals(configuration, "Release"))
+    .Does(() =>
+{
+    CakeExecuteScript("./test.cake");
+});
 
 Task("Create-NuGet-Package")
     .IsDependentOn("Build")
+    .IsDependentOn("Test")
     .Does(() =>
 {
     if (!DirectoryExists(nugetRoot))

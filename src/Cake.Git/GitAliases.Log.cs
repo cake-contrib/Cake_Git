@@ -24,7 +24,6 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
-        [CakeNamespaceImport("LibGit2Sharp")]
         public static GitCommit GitLogTip(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath
@@ -56,7 +55,6 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
-        [CakeNamespaceImport("LibGit2Sharp")]
         public static ICollection<GitCommit> GitLog(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath,
@@ -92,7 +90,6 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
-        [CakeNamespaceImport("LibGit2Sharp")]
         public static ICollection<GitCommit> GitLog(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath,
@@ -118,13 +115,11 @@ namespace Cake.Git
                 repositoryDirectoryPath,
                 repository =>
                 {
-                    var sinceCommit = repository.Lookup<Commit>(sinceCommitId);
-                    var refsUpToCommit = repository.Refs.ReachableFrom(new[] {sinceCommit});
                     return repository.Commits
                         .QueryBy(new CommitFilter
                         {
-                            IncludeReachableFrom = sinceCommit,
-                            ExcludeReachableFrom = refsUpToCommit
+                            IncludeReachableFrom = sinceCommitId,
+                            ExcludeReachableFrom = repository.Lookup<Commit>(sinceCommitId).Parents
                         })
                         .Select(commit => new GitCommit(commit))
                         .ToList();
@@ -133,7 +128,7 @@ namespace Cake.Git
         }
 
         /// <summary>
-        /// Get up to 15 commit logs.
+        /// Get specific commit.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
@@ -142,7 +137,6 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
-        [CakeNamespaceImport("LibGit2Sharp")]
         public static GitCommit GitLogLookup(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath,

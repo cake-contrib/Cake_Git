@@ -190,3 +190,6 @@ FakesAssemblies/
 
 # Kudu Local
 [Ll]ocal[Dd]eploy/
+
+# Repo tests
+[Tt]est[Rr]epo/

@@ -19,7 +19,9 @@ namespace Cake.Git
         /// <param name="sourceUrl">URI for the remote repository.</param>
         /// <param name="workDirectoryPath">Local path to clone into.</param>
         /// <returns>The path to the created repository.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">If any of the arguments are null.</exception>
+        /// <exception cref="DirectoryNotFoundException">If parent directory doesnt exist.</exception>
+        /// <exception cref="IOException">If workDirectoryPath already exists.</exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Clone")]
         public static DirectoryPath GitClone(
@@ -44,11 +46,19 @@ namespace Cake.Git
             }
 
             var workFullDirectoryPath = workDirectoryPath.MakeAbsolute(context.Environment);
+            var parentFullDirectoryPath = workFullDirectoryPath.Combine("../").Collapse();
 
-            if (!context.FileSystem.Exist(workFullDirectoryPath))
+            if (!context.FileSystem.Exist(parentFullDirectoryPath))
             {
-                throw new DirectoryNotFoundException($"Failed to find workDirectoryPath: {workFullDirectoryPath}");
+                throw new DirectoryNotFoundException($"Failed to find {nameof(parentFullDirectoryPath)}: {parentFullDirectoryPath}");
             }
+
+            if (context.FileSystem.Exist(workFullDirectoryPath))
+            {
+                throw new IOException($"{nameof(workFullDirectoryPath)} already exists: {workFullDirectoryPath}");
+            }
+
+            context.FileSystem.GetDirectory(workFullDirectoryPath).Create();
 
             return Repository.Clone(sourceUrl, workFullDirectoryPath.FullPath);
         }
@@ -66,7 +76,6 @@ namespace Cake.Git
         /// <returns>The path to the created repository.</returns>
         [CakeMethodAlias]
         [CakeAliasCategory("Clone")]
-        [CakeNamespaceImport("LibGit2Sharp")]
         public static DirectoryPath GitClone(
             this ICakeContext context,
             string sourceUrl,

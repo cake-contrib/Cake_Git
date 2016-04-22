@@ -25,7 +25,6 @@ namespace Cake.Git
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Commit")]
-        [CakeNamespaceImport("LibGit2Sharp")]
         public static GitCommit GitCommit(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath,

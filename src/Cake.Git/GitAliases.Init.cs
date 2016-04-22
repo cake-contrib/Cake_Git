@@ -19,10 +19,10 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="initDirectoryPath">The path to the working folder when initializing a standard ".git" repository.</param>
         /// <returns>The path to the created repository.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">If any of the parameters are null.</exception>
+        /// <exception cref="DirectoryNotFoundException">If initDirectoryPath doesn't exist.</exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Init")]
-        [CakeNamespaceImport("LibGit2Sharp")]
         public static DirectoryPath GitInit(
             this ICakeContext context,
             DirectoryPath initDirectoryPath
