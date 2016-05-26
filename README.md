@@ -1,5 +1,7 @@
 # Cake Git
 
+[![NuGet](https://img.shields.io/nuget/v/Cake.Git.svg)](https://www.nuget.org/packages/Cake.Git)
+
 Cake AddIn that extends Cake with Git features using LibGit2 and LibGit2Sharp
 
 | Build server                | Platform     | Status                                                                                                                    |
