@@ -300,6 +300,18 @@ Task("Git-Diff")
     }
 });
 
+Task("Git-Find-Root-From-Path")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    var deepFolder = testInitalRepo.Combine("test-folder/deep");
+    CreateDirectory(deepFolder);
+    var rootFolder = GitFindRootFromPath(deepFolder);
+    Information("Git root folder found: {0}", rootFolder);
+    if (rootFolder.FullPath != testInitalRepo.FullPath)
+        throw new Exception(string.Format("Wrong git root found (actual: {0}, expected: {1})", rootFolder, testInitalRepo));
+});
+
 Task("Git-Set-Tag")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
@@ -426,6 +438,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Clone")
     .IsDependentOn("Git-Diff")
+    .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Describe");
 
 ///////////////////////////////////////////////////////////////////////////////
