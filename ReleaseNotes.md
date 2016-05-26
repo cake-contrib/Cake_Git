@@ -5,6 +5,9 @@
 * Added Git Commit / Author ToString() overrides
 * Removed unused attributes
 * Added test.cake script
+* Added GitDescribe alias
+* Added GitFindRootFromPath
+* Updated LibGit to 0.23.0 prerelease to support Mono (OSX & Linux)
 ### New in 0.1.0 (Released 2016/04/18)
 * Inital Release
 * Updated LibGit to 0.22 stable
