@@ -41,10 +41,11 @@ namespace Cake.Git
 
             context.UseRepository(
                 repositoryDirectoryPath,
-                repository => repository.Remove(
+                repository => Commands.Remove(
+                    repository,
                     filePaths.ToRelativePathStrings(context, repositoryDirectoryPath),
                     removeFromWorkingDirectory,
-                    new ExplicitPathsOptions ()
+                    new ExplicitPathsOptions()
                     )
                 );
         }

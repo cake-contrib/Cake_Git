@@ -3,6 +3,7 @@ using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
 using Cake.Git.Extensions;
+using LibGit2Sharp;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
@@ -35,12 +36,12 @@ namespace Cake.Git
             {
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
-
+            
             context.UseRepository(
                 repositoryDirectoryPath,
-                repository => Array.ForEach(
-                    filePaths.ToRelativePathStrings(context, repositoryDirectoryPath),
-                    filePath=>repository.Index.Add(filePath)
+                repository => Commands.Stage(
+                    repository,
+                    filePaths.ToRelativePathStrings(context, repositoryDirectoryPath)
                     )
                 );
         }

@@ -53,7 +53,8 @@ namespace Cake.Git
                 context.UseRepository(
                     repositoryDirectoryPath,
                     repository =>
-                        repository.Network.Pull(
+                        Commands.Pull(
+                            repository,
                             new Signature(
                                 mergerName,
                                 mergerEmail,
@@ -117,8 +118,10 @@ namespace Cake.Git
                             throw new NotFoundException("Remote named {0} not found", remoteName);
                         }
 
-                        repository.Network.Fetch(
-                            remote,
+                        Commands.Fetch(
+                            repository,
+                            remote.Name,
+                            new string[0],
                             new FetchOptions
                             {
                                 CredentialsProvider =
@@ -128,7 +131,8 @@ namespace Cake.Git
                                             Username = username,
                                             Password = password
                                         }
-                            }
+                            },
+                            null
                             );
 
                         return repository.MergeFetchedRefs(

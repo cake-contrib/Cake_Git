@@ -57,12 +57,12 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                                                     new NuSpecContent {Source = "LibGit2Sharp.dll"},
                                                                     new NuSpecContent {Source = "LibGit2Sharp.pdb"},
                                                                     new NuSpecContent {Source = "LibGit2Sharp.xml"},
-                                                                    new NuSpecContent {Source = "NativeBinaries/amd64/git2-785d8c4.dll", Target = "lib/amd64/git2-785d8c4.dll"},
-                                                                    new NuSpecContent {Source = "NativeBinaries/amd64/git2-785d8c4.pdb", Target = "lib/amd64/git2-785d8c4.pdb"},
-                                                                    new NuSpecContent {Source = "NativeBinaries/linux/amd64/libgit2-785d8c4.so", Target = "lib/linux/amd64/libgit2-785d8c4.so"},
-                                                                    new NuSpecContent {Source = "NativeBinaries/osx/libgit2-785d8c4.dylib", Target = "lib/osx/libgit2-785d8c4.dylib"},
-                                                                    new NuSpecContent {Source = "NativeBinaries/x86/git2-785d8c4.dll", Target = "lib/x86/git2-785d8c4.dll"},
-                                                                    new NuSpecContent {Source = "NativeBinaries/x86/git2-785d8c4.pdb", Target = "lib/x86/git2-785d8c4.pdb"},
+                                                                    new NuSpecContent {Source = "lib/win32/x64/git2-381caf5.dll", Target = "lib/win32/x64/git2-381caf5.dll"},
+                                                                    new NuSpecContent {Source = "lib/win32/x64/git2-381caf5.pdb", Target = "lib/win32/x64/git2-381caf5.pdb"},
+                                                                    new NuSpecContent {Source = "lib/linux/x86_64/libgit2-381caf5.so", Target = "lib/linux/x86_64/libgit2-381caf5.so"},
+                                                                    new NuSpecContent {Source = "lib/osx/libgit2-381caf5.dylib", Target = "lib/osx/libgit2-381caf5.dylib"},
+                                                                    new NuSpecContent {Source = "lib/win32/x86/git2-381caf5.dll", Target = "lib/win32/x86/git2-381caf5.dll"},
+                                                                    new NuSpecContent {Source = "lib/win32/x86/git2-381caf5.pdb", Target = "lib/win32/x86/git2-381caf5.pdb"},
                                                                  },
                                 BasePath                = binDir,
                                 OutputDirectory         = nugetRoot
@@ -177,10 +177,6 @@ Task("Test")
     .WithCriteria(() => StringComparer.OrdinalIgnoreCase.Equals(configuration, "Release"))
     .Does(() =>
 {
-    if (IsRunningOnUnix())
-    {
-        CopyDirectory("./src/Cake.Git/bin/Release/NativeBinaries", "./src/Cake.Git/bin/Release/lib");
-    }
     CakeExecuteScript("./test.cake");
 });
 
