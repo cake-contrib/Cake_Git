@@ -177,6 +177,10 @@ Task("Test")
     .WithCriteria(() => StringComparer.OrdinalIgnoreCase.Equals(configuration, "Release"))
     .Does(() =>
 {
+    if (IsRunningOnUnix())
+    {
+        CopyDirectory("./src/Cake.Git/bin/Release/NativeBinaries", "./src/Cake.Git/bin/Release/lib");
+    }
     CakeExecuteScript("./test.cake");
 });
 
