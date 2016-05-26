@@ -59,6 +59,7 @@
     <Compile Include="Extensions\PathExtensions.cs" />
     <Compile Include="GitAliases.Commit.cs" />
     <Compile Include="GitAliases.cs" />
+    <Compile Include="GitAliases.Describe.cs" />
     <Compile Include="GitAliases.Diff.cs" />
     <Compile Include="GitAliases.Init.cs" />
     <Compile Include="GitAliases.Log.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="GitAliases.Push.cs" />
     <Compile Include="GitChangeKind.cs" />
     <Compile Include="GitCommit.cs" />
+    <Compile Include="GitDescribeStrategy.cs" />
     <Compile Include="GitDiffFile.cs" />
     <Compile Include="GitMergeResult.cs" />
     <Compile Include="GitMergeStatus.cs" />

@@ -300,6 +300,109 @@ Task("Git-Diff")
     }
 });
 
+Task("Git-Set-Tag")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    var processSettings = new ProcessSettings()
+        .WithArguments(x => x.AppendSwitch("tag", "test-tag"))
+        .UseWorkingDirectory(testInitalRepo);
+    StartProcess("git", processSettings);
+});
+
+Task("Git-Describe-Generic")
+    .IsDependentOn("Git-Set-Tag")
+    .Does(() =>
+{
+    var tag = GitDescribe(testInitalRepo);
+    Information("Describe returned: [{0}]", tag);
+    if (!tag.Contains("test-tag"))
+        throw new Exception("Wrong described tag: " + tag);
+});
+
+Task("Git-Describe-Tags")
+    .IsDependentOn("Git-Set-Tag")
+    .Does(() =>
+{
+    var tag = GitDescribe(testInitalRepo, GitDescribeStrategy.Tags);
+    Information("Describe returned: [{0}]", tag);
+    if (!tag.Contains("test-tag"))
+        throw new Exception("Wrong described tag: " + tag);
+});
+
+Task("Git-Describe-Long")
+    .IsDependentOn("Git-Set-Tag")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-tag"))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!tagNotAlwaysLong.Equals("test-tag"))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Abbrev")
+    .IsDependentOn("Git-Set-Tag")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-tag"))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!tagNotAlwaysLong.Equals("test-tag"))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Commit")
+    .IsDependentOn("Git-Set-Tag")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-tag"))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!tagNotAlwaysLong.Equals("test-tag"))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Commit-NoTag")
+    .IsDependentOn("Git-Set-Tag")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!string.IsNullOrEmpty(tagAlwaysLong))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!string.IsNullOrEmpty(tagNotAlwaysLong))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Master")
+    .IsDependentOn("Git-Set-Tag")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, "master", true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, "master", false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-tag"))
+        throw new Exception("Wrong describe");
+    if (!tagNotAlwaysLong.Equals("test-tag"))
+        throw new Exception("Wrong describe");
+});
+
+Task("Git-Describe")
+    .IsDependentOn("Git-Describe-Generic")
+    .IsDependentOn("Git-Describe-Tags")
+    .IsDependentOn("Git-Describe-Long")
+    .IsDependentOn("Git-Describe-Abbrev")
+    .IsDependentOn("Git-Describe-Commit")
+    .IsDependentOn("Git-Describe-Commit-NoTag")
+    .IsDependentOn("Git-Describe-Master");
 
 Task("Git-Log")
     .IsDependentOn("Git-Log-TipToCommitId")
@@ -322,7 +425,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Clone")
-    .IsDependentOn("Git-Diff");
+    .IsDependentOn("Git-Diff")
+    .IsDependentOn("Git-Describe");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
