@@ -152,11 +152,23 @@ Task("Build")
     foreach(var solution in solutions)
     {
         Information("Building {0}", solution);
-        MSBuild(solution, settings =>
-            settings.SetPlatformTarget(PlatformTarget.MSIL)
-                .WithProperty("TreatWarningsAsErrors","true")
-                .WithTarget("Build")
-                .SetConfiguration(configuration));
+        if (IsRunningOnUnix())
+        {
+             XBuild(solution, new XBuildSettings()
+                .SetConfiguration(configuration)
+                .WithProperty("POSIX", "True")
+                .WithProperty("TreatWarningsAsErrors", "True")
+                .SetVerbosity(Verbosity.Minimal)
+            );
+        }
+        else
+        {
+            MSBuild(solution, settings =>
+                settings.SetPlatformTarget(PlatformTarget.MSIL)
+                    .WithProperty("TreatWarningsAsErrors","true")
+                    .WithTarget("Build")
+                    .SetConfiguration(configuration));
+        }
     }
 });
 
@@ -213,6 +225,9 @@ Task("Default")
 
 Task("AppVeyor")
     .IsDependentOn("Publish-MyGet");
+
+Task("Travis")
+    .IsDependentOn("Test");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
