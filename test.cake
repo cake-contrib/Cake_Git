@@ -407,6 +407,13 @@ Task("Git-Describe-Master")
         throw new Exception("Wrong describe");
 });
 
+Task("Git-Current-Branch")
+    .Does(() =>
+{
+    var branch = GitBranchCurrent(testInitalRepo);
+    Information("Current branch: {0}", branch);
+});
+
 Task("Git-Describe")
     .IsDependentOn("Git-Describe-Generic")
     .IsDependentOn("Git-Describe-Tags")
@@ -439,7 +446,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-Clone")
     .IsDependentOn("Git-Diff")
     .IsDependentOn("Git-Find-Root-From-Path")
-    .IsDependentOn("Git-Describe");
+    .IsDependentOn("Git-Describe")
+    .IsDependentOn("Git-Current-Branch");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
