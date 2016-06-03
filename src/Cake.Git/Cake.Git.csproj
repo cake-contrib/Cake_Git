@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GitAliases.Branch.cs" />
     <Compile Include="GitAliases.Checkout.cs" />
     <Compile Include="Extensions\RepositoryExtensions.cs" />
     <Compile Include="GitAliases.Add.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="GitAliases.Log.cs" />
     <Compile Include="GitAliases.Pull.cs" />
     <Compile Include="GitAliases.Push.cs" />
+    <Compile Include="GitBranch.cs" />
     <Compile Include="GitChangeKind.cs" />
     <Compile Include="GitCommit.cs" />
     <Compile Include="GitDescribeStrategy.cs" />
