@@ -27,8 +27,6 @@ GitCommit   initalCommit    = null,
             removeCommit    = null,
             modifiedCommit  = null;
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
 ///////////////////////////////////////////////////////////////////////////////
@@ -244,7 +242,7 @@ Task("Modify-Test-Files")
     testModifyFiles = testFiles
         .Except(testDeleteFiles)
         .Select(modifyFilePath => {
-            Information("Mofifying file {0}...", modifyFilePath);
+            Information("Modifying file {0}...", modifyFilePath);
             CreateRandomDataFile(Context, modifyFilePath);
             return modifyFilePath;
             })
@@ -414,6 +412,34 @@ Task("Git-Current-Branch")
     Information("Current branch: {0}", branch);
 });
 
+Task("Git-Reset-Modify-Files")
+  .Does(() =>
+{
+  testModifyFiles = testFiles
+      .Select(modifyFilePath => {
+          Information("Modifying file {0}...", modifyFilePath);
+          CreateRandomDataFile(Context, modifyFilePath);
+          return modifyFilePath;
+          })
+          .ToArray();
+});
+
+Task("Git-Reset-Stage-File")
+  .IsDependentOn("Git-Reset-Modify-Files")
+  .Does(() =>
+{
+    Information("Staging files...");
+    GitAdd(testInitalRepo, testModifyFiles);
+});
+
+Task("Git-Reset-Hard")
+  .IsDependentOn("Git-Reset-Stage-File")
+  .Does(() =>
+{
+    Information("Performing hard reset on files...");
+    GitReset(testInitalRepo, GitResetMode.Hard);
+});
+
 Task("Git-Describe")
     .IsDependentOn("Git-Describe-Generic")
     .IsDependentOn("Git-Describe-Tags")
@@ -428,6 +454,11 @@ Task("Git-Log")
     .IsDependentOn("Git-Log-Tip")
     .IsDependentOn("Git-Log-TipToRange")
     .IsDependentOn("Git-Log-Lookup");
+
+Task("Git-Reset")
+    .IsDependentOn("Git-Reset-Modify-Files")
+    .IsDependentOn("Git-Reset-Stage-File")
+    .IsDependentOn("Git-Reset-Hard");
 
 Task("Default-Tests")
     .IsDependentOn("Git-Init")
@@ -446,6 +477,27 @@ Task("Default-Tests")
     .IsDependentOn("Git-Clone")
     .IsDependentOn("Git-Diff")
     .IsDependentOn("Git-Find-Root-From-Path")
+    .IsDependentOn("Git-Reset")
+    .IsDependentOn("Git-Describe")
+    .IsDependentOn("Git-Current-Branch");
+
+Task("Local-Tests")
+    .IsDependentOn("Git-Init")
+    .IsDependentOn("Create-Test-Files")
+    .IsDependentOn("Git-Init-Add")
+    .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-Init-Diff")
+    .IsDependentOn("Git-Log")
+    .IsDependentOn("Git-Remove")
+    .IsDependentOn("Git-Remove-Commit")
+    .IsDependentOn("Git-Remove-Diff")
+    .IsDependentOn("Modify-Test-Files")
+    .IsDependentOn("Git-Modify-Add")
+    .IsDependentOn("Git-Modify-Commit")
+    .IsDependentOn("Git-Modify-Diff")
+    .IsDependentOn("Git-Diff")
+    .IsDependentOn("Git-Find-Root-From-Path")
+    .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Current-Branch");
 
@@ -484,5 +536,4 @@ public static void CreateRandomDataFile(ICakeContext context, FilePath filePath)
             }
         }
     }
-
 }

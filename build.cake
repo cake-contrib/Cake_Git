@@ -177,7 +177,7 @@ Task("Test")
     .WithCriteria(() => StringComparer.OrdinalIgnoreCase.Equals(configuration, "Release"))
     .Does(() =>
 {
-    CakeExecuteScript("./test.cake");
+    CakeExecuteScript("./test.cake", new CakeSettings{ Arguments = new Dictionary<string, string>{{"target", target == "Default" ? "Default-Tests" : "Local-Tests"}}});
 });
 
 Task("Create-NuGet-Package")
@@ -221,6 +221,9 @@ Task("Publish-MyGet")
 
 
 Task("Default")
+    .IsDependentOn("Create-NuGet-Package");
+
+Task("Local-Tests")
     .IsDependentOn("Create-NuGet-Package");
 
 Task("AppVeyor")
