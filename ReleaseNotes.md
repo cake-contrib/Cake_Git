@@ -1,3 +1,5 @@
+### New in 0.4.0 (Released 2016/06/22)
+* Added GitReset alias
 ### New in 0.3.0 (Released 2016/06/03)
 * Added GitBranchCurrent alias
 ### New in 0.2.0 (Released 2016/04/22)
