@@ -412,6 +412,15 @@ Task("Git-Current-Branch")
     Information("Current branch: {0}", branch);
 });
 
+Task("Git-Checkout")
+    .Does(() =>
+{
+    GitCheckout(testInitalRepo, "master");
+    var branch = GitBranchCurrent(testInitalRepo);
+     if (branch.FriendlyName != "master")
+        throw new Exception(string.Format("branch is incorrect. Expected master and got {0}", branch.FriendlyName));
+});
+
 Task("Git-Reset-Modify-Files")
   .Does(() =>
 {
@@ -479,7 +488,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
-    .IsDependentOn("Git-Current-Branch");
+    .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Checkout");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -499,7 +509,8 @@ Task("Local-Tests")
     .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
-    .IsDependentOn("Git-Current-Branch");
+    .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Checkout");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
@@ -44,14 +45,27 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
 
-            context.UseRepository(
-                repositoryDirectoryPath,
-                repository => repository.CheckoutPaths(
-                    committishOrBranchSpec,
-                    filePaths.ToRelativePathStrings(context, repositoryDirectoryPath),
-                    new CheckoutOptions { CheckoutModifiers = CheckoutModifiers.Force }
-                    )
-                );
+            if (filePaths.Any())
+            {
+                context.UseRepository(
+                    repositoryDirectoryPath,
+                    repository => repository.CheckoutPaths(
+                        committishOrBranchSpec,
+                        filePaths.ToRelativePathStrings(context, repositoryDirectoryPath),
+                        new CheckoutOptions { CheckoutModifiers = CheckoutModifiers.Force }
+                        )
+                    );
+            }
+            else
+            {
+                context.UseRepository(
+                    repositoryDirectoryPath,
+                    repository => repository.Checkout(
+                        committishOrBranchSpec,
+                        new CheckoutOptions { CheckoutModifiers = CheckoutModifiers.Force }
+                        )
+                    );
+            }
         }
 
         /// <summary>
