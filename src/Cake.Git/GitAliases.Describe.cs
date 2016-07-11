@@ -6,10 +6,12 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Git.Extensions;
 using LibGit2Sharp;
+// ReSharper disable UnusedMember.Global
+// ReSharper disable IntroduceOptionalParameters.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Cake.Git
 {
-    // ReSharper disable once PublicMembersMustHaveComments
     public static partial class GitAliases
     {
         /// <summary>
@@ -32,8 +34,8 @@ namespace Cake.Git
         {
             return GitDescribe(context,
                 repositoryDirectoryPath,
-                renderLongFormat: false,
                 strategy: GitDescribeStrategy.All,
+                renderLongFormat: false,
                 minimumCommitIdAbbreviatedSize: null);
         }
 
@@ -141,15 +143,12 @@ namespace Cake.Git
 
             return context.UseRepository(
                 repositoryDirectoryPath,
-                repository =>
-                {
-                    return GitDescribeImpl(context,
-                        repository,
-                        repository.Head.Commits.First(),
-                        renderLongFormat,
-                        strategy,
-                        minimumCommitIdAbbreviatedSize);
-                });
+                repository => GitDescribeImpl(context,
+                    repository,
+                    repository.Head.Commits.First(),
+                    renderLongFormat,
+                    strategy,
+                    minimumCommitIdAbbreviatedSize));
         }
 
         /// <summary>

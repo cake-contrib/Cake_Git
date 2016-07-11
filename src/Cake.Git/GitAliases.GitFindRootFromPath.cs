@@ -3,6 +3,7 @@ using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
 using LibGit2Sharp;
+// ReSharper disable UnusedMember.Global
 
 namespace Cake.Git
 {

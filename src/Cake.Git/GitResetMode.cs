@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+// ReSharper disable UnusedMember.Global
 
 namespace Cake.Git
 {

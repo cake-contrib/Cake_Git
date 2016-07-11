@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Cake.Git
 {

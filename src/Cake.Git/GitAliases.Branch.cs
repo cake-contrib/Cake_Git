@@ -3,10 +3,10 @@ using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
 using Cake.Git.Extensions;
+// ReSharper disable UnusedMember.Global
 
 namespace Cake.Git
 {
-    // ReSharper disable once PublicMembersMustHaveComments
     public static partial class GitAliases
     {
         /// <summary>
