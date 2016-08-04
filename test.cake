@@ -310,18 +310,22 @@ Task("Git-Find-Root-From-Path")
         throw new Exception(string.Format("Wrong git root found (actual: {0}, expected: {1})", rootFolder, testInitalRepo));
 });
 
-Task("Git-Set-Tag")
+Task("Git-Tag-Apply-Objectish")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
 {
-    var processSettings = new ProcessSettings()
-        .WithArguments(x => x.AppendSwitch("tag", "test-tag"))
-        .UseWorkingDirectory(testInitalRepo);
-    StartProcess("git", processSettings);
+    GitTag(testInitalRepo, "test-tag-objectish", modifiedCommit.Sha);
+});
+
+Task("Git-Tag-Apply")
+    .IsDependentOn("Git-Tag-Apply-Objectish")
+    .Does(() =>
+{
+    GitTag(testInitalRepo, "test-tag");
 });
 
 Task("Git-Describe-Generic")
-    .IsDependentOn("Git-Set-Tag")
+    .IsDependentOn("Git-Tag")
     .Does(() =>
 {
     var tag = GitDescribe(testInitalRepo);
@@ -331,7 +335,7 @@ Task("Git-Describe-Generic")
 });
 
 Task("Git-Describe-Tags")
-    .IsDependentOn("Git-Set-Tag")
+    .IsDependentOn("Git-Tag")
     .Does(() =>
 {
     var tag = GitDescribe(testInitalRepo, GitDescribeStrategy.Tags);
@@ -341,7 +345,7 @@ Task("Git-Describe-Tags")
 });
 
 Task("Git-Describe-Long")
-    .IsDependentOn("Git-Set-Tag")
+    .IsDependentOn("Git-Tag")
     .Does(() =>
 {
     var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags);
@@ -354,7 +358,7 @@ Task("Git-Describe-Long")
 });
 
 Task("Git-Describe-Abbrev")
-    .IsDependentOn("Git-Set-Tag")
+    .IsDependentOn("Git-Tag")
     .Does(() =>
 {
     var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags, 16);
@@ -367,7 +371,7 @@ Task("Git-Describe-Abbrev")
 });
 
 Task("Git-Describe-Commit")
-    .IsDependentOn("Git-Set-Tag")
+    .IsDependentOn("Git-Tag")
     .Does(() =>
 {
     var tagAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, true, GitDescribeStrategy.Tags, 16);
@@ -380,7 +384,7 @@ Task("Git-Describe-Commit")
 });
 
 Task("Git-Describe-Commit-NoTag")
-    .IsDependentOn("Git-Set-Tag")
+    .IsDependentOn("Git-Tag")
     .Does(() =>
 {
     var tagAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, true, GitDescribeStrategy.Tags, 16);
@@ -393,7 +397,7 @@ Task("Git-Describe-Commit-NoTag")
 });
 
 Task("Git-Describe-Master")
-    .IsDependentOn("Git-Set-Tag")
+    .IsDependentOn("Git-Tag")
     .Does(() =>
 {
     var tagAlwaysLong = GitDescribe(testInitalRepo, "master", true, GitDescribeStrategy.Tags, 16);
@@ -448,6 +452,12 @@ Task("Git-Reset-Hard")
     Information("Performing hard reset on files...");
     GitReset(testInitalRepo, GitResetMode.Hard);
 });
+
+
+
+Task("Git-Tag")
+    .IsDependentOn("Git-Tag-Apply")
+    .IsDependentOn("Git-Tag-Apply-Objectish");
 
 Task("Git-Describe")
     .IsDependentOn("Git-Describe-Generic")

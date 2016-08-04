@@ -1,3 +1,6 @@
+### New in 0.7.0 (Released 2016/08/04)
+* Added GitTag alias
+* Updated to Cake.Core 0.15.2
 ### New in 0.6.0 (Released 2016/07/11)
 * Updated to Cake.Core 0.14.0
 ### New in 0.5.0 (Released 2016/07/01)

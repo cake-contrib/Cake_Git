@@ -45,7 +45,5 @@ namespace Cake.Git
                     )
                 );
         }
-
-        
     }
 }
