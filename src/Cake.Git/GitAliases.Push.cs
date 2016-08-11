@@ -18,7 +18,6 @@ namespace Cake.Git
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
-        /// <returns>The path to the created repository.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Push")]
@@ -60,7 +59,6 @@ namespace Cake.Git
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <param name="username">Username used for authentication.</param>
         /// <param name="password">Password used for authentication.</param>
-        /// <returns>The path to the created repository.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Push")]
@@ -115,7 +113,6 @@ namespace Cake.Git
         /// <param name="username">Username used for authentication.</param>
         /// <param name="password">Password used for authentication.</param>
         /// <param name="branchName">Name of branch to push.</param>
-        /// <returns>The path to the created repository.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Push")]
