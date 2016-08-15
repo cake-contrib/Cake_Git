@@ -167,5 +167,134 @@ namespace Cake.Git
                 }
                 );
         }
+
+        /// <summary>
+        /// Push a tag to a remote unauthenticated.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Repository path.</param>
+        /// <param name="remote">The <see cref="T:LibGit2Sharp.Remote"/> to push to.</param>
+        /// <param name="pushRefSpec">The pushRefSpec to push.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Push")]
+        public static void GitPushRef(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            string remote, string pushRefSpec)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (repositoryDirectoryPath == null)
+            {
+                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
+            }
+
+            if (remote == null)
+            {
+                throw new ArgumentNullException(nameof(remote));
+            }
+
+            if (string.IsNullOrWhiteSpace(remote))
+            {
+                throw new ArgumentException("Remote cannot be empty", nameof(remote));
+            }
+
+            if (pushRefSpec == null)
+            {
+                throw new ArgumentNullException(nameof(pushRefSpec));
+            }
+
+            if (string.IsNullOrWhiteSpace(pushRefSpec))
+            {
+                throw new ArgumentException("Pushrefspec cannot be empty", nameof(pushRefSpec));
+            }
+
+            context.UseRepository(
+                repositoryDirectoryPath,
+                repository => repository.Network.Push(repository.Network.Remotes[remote],
+                repository.Tags[pushRefSpec].CanonicalName)
+                );
+        }
+
+        /// <summary>
+        /// Push a tag to a remote authenticated.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Repository path.</param>
+        /// <param name="username">Username used for authentication.</param>
+        /// <param name="password">Password used for authentication.</param>
+        /// <param name="remote">The <see cref="T:LibGit2Sharp.Remote"/> to push to.</param>
+        /// <param name="pushRefSpec">The pushRefSpec to push.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Push")]
+        public static void GitPushRef(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            string username,
+            string password,
+            string remote, string pushRefSpec)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (repositoryDirectoryPath == null)
+            {
+                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
+            }
+
+            if (remote == null)
+            {
+                throw new ArgumentNullException(nameof(remote));
+            }
+
+            if (string.IsNullOrWhiteSpace(remote))
+            {
+                throw new ArgumentException("Remote cannot be empty", nameof(remote));
+            }
+
+            if (pushRefSpec == null)
+            {
+                throw new ArgumentNullException(nameof(pushRefSpec));
+            }
+
+            if (string.IsNullOrWhiteSpace(pushRefSpec))
+            {
+                throw new ArgumentException("Pushrefspec cannot be empty", nameof(pushRefSpec));
+            }
+
+            if (username == null)
+            {
+                throw new ArgumentNullException(nameof(username));
+            }
+
+            if (password == null)
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+
+            var options = new PushOptions
+            {
+                CredentialsProvider = (url, usernameFromUrl, types) =>
+                    new UsernamePasswordCredentials
+                    {
+                        Username = username,
+                        Password = password
+                    }
+            };
+
+            context.UseRepository(
+                repositoryDirectoryPath,
+                repository => repository.Network.Push(repository.Network.Remotes[remote], 
+                repository.Tags[pushRefSpec].CanonicalName, 
+                options)
+                );
+        }
     }
 }
