@@ -60,7 +60,7 @@ namespace Cake.Git
             {
                 context.UseRepository(
                     repositoryDirectoryPath,
-                    repository => repository.Checkout(
+                    repository => Commands.Checkout(repository,
                         committishOrBranchSpec,
                         new CheckoutOptions { CheckoutModifiers = CheckoutModifiers.Force }
                         )
