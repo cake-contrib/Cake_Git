@@ -31,7 +31,7 @@ GitCommit   initalCommit    = null,
 // SETUP / TEARDOWN
 ///////////////////////////////////////////////////////////////////////////////
 
-Setup(() =>
+Setup(ctx =>
 {
     // Executed BEFORE the first task.
     Information("Running tasks...");
@@ -46,7 +46,7 @@ Setup(() =>
     Information(buildStartMessage);
 });
 
-Teardown(() =>
+Teardown(ctx =>
 {
     // Executed AFTER the last task.
     Information("Finished running tasks.");
@@ -69,7 +69,7 @@ Teardown(() =>
     }
     catch(Exception ex)
     {
-        Error("Failed to clean up test reop {0}", testRepo);
+        Error("Failed to clean up test reop {0}\r\n{1}", testRepo, ex);
     }
 });
 
