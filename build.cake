@@ -177,7 +177,17 @@ Task("Test")
     .WithCriteria(() => StringComparer.OrdinalIgnoreCase.Equals(configuration, "Release"))
     .Does(() =>
 {
-    CakeExecuteScript("./test.cake", new CakeSettings{ Arguments = new Dictionary<string, string>{{"target", target == "Default" ? "Default-Tests" : "Local-Tests"}}});
+    Action executeTests = ()=> CakeExecuteScript("./test.cake", new CakeSettings{ Arguments = new Dictionary<string, string>{{"target", target == "Default" ? "Default-Tests" : "Local-Tests"}}});
+    if (TravisCI.IsRunningOnTravisCI)
+    {
+        using(TravisCI.Fold("Execute-Tests"))
+        {
+            executeTests();
+            return;
+        }
+    }
+
+    executeTests();
 });
 
 Task("Create-NuGet-Package")
