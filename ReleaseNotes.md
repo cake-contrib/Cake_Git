@@ -1,3 +1,5 @@
+### New in 0.8.0 (Released 2016/08/16)
+* Added GitPushRef alias, which adds possibility to push tags
 ### New in 0.7.0 (Released 2016/08/04)
 * Added GitTag alias
 * Updated to Cake.Core 0.15.2
