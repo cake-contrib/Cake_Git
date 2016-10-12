@@ -416,6 +416,13 @@ Task("Git-Current-Branch")
     Information("Current branch: {0}", branch);
 });
 
+Task("Git-Remote-Branch")
+    .Does(() =>
+{
+    var branch = GitBranchCurrent(".");
+    Information("Remote branch: {0}", branch);
+});
+
 Task("Git-Checkout")
     .Does(() =>
 {
@@ -499,6 +506,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout");
 
 Task("Local-Tests")
@@ -520,6 +528,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout");
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -27,14 +27,34 @@ namespace Cake.Git
         public GitCommit Tip { get; }
 
         /// <summary>
+        /// Gets a value indicating whether this branch is remote.
+        /// </summary>
+        /// <value>The a value indicating whether this branch is remote.</value>
+        public bool IsRemote { get; }
+
+        /// <summary>
+        /// Gets the remote name for this branch.
+        /// </summary>
+        /// <value>The remote name for this branch.</value>
+        public string RemoteName { get; }
+
+        /// <summary>
+        /// Gets or sets the remotes.
+        /// </summary>
+        public System.Collections.Generic.List<GitRemote> Remotes { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="GitBranch"/> class.
         /// </summary>
-        /// <param name="branch">The branch.</param>
-        public GitBranch(Branch branch)
+        /// <param name="repository">The repository.</param>
+        public GitBranch(Repository repository)
         {
-            CanonicalName = branch.CanonicalName;
-            FriendlyName = branch.FriendlyName;
-            Tip = new GitCommit(branch.Tip);
+            CanonicalName = repository.Head.CanonicalName;
+            FriendlyName = repository.Head.FriendlyName;
+            Tip = new GitCommit(repository.Head.Tip);
+            IsRemote = repository.Head.IsRemote;
+            RemoteName = repository.Head.RemoteName;
+            Remotes = System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(repository.Network.Remotes, remote => new GitRemote(remote.Name, remote.PushUrl, remote.Url)));
         }
 
         /// <summary>
@@ -43,7 +63,7 @@ namespace Cake.Git
         /// <returns><see cref="GitBranch"/> as string</returns>
         public override string ToString()
         {
-            return $"Canonical name: {CanonicalName}, Friendly name: {FriendlyName}, Tip: ({Tip})";
+            return $"Canonical name: {CanonicalName}, Friendly name: {FriendlyName}, Tip: ({Tip}), IsRemote: ({IsRemote}), RemoteName: ({RemoteName}), Remotes: [{System.String.Join(", ", Remotes)}]";
         }
     }
 }

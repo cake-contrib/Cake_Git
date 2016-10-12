@@ -31,7 +31,7 @@ namespace Cake.Git
 
             return context.UseRepository(
                 repositoryDirectoryPath,
-                repository => new GitBranch(repository.Head)
+                repository => new GitBranch(repository)
                 );
         }
     }
