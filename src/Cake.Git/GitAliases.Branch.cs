@@ -23,8 +23,8 @@ namespace Cake.Git
         /// repositoryDirectoryPath</exception>
         /// <example>
         ///   <code>
-        /// DirectoryPath repositoryDirectoryPath = DirectoryPath.FromString(".");
-        /// GitBranch currentBranch = ((ICakeContext)cakeContext).GitBranchCurrent(repositoryDirectoryPath);
+        /// var repositoryDirectoryPath = DirectoryPath.FromString(".");
+        /// var currentBranch = ((ICakeContext)cakeContext).GitBranchCurrent(repositoryDirectoryPath);
         ///   </code>
         /// </example>
         [CakeMethodAlias]

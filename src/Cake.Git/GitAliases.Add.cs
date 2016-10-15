@@ -28,8 +28,8 @@ namespace Cake.Git
         /// </exception>
         /// <example>
         ///   <code>
-        /// DirectoryPath repositoryDirectoryPath = DirectoryPath.FromString(".");
-        /// FilePath[] filePaths = new FilePath[] { ".\\test.txt" };
+        /// var repositoryDirectoryPath = DirectoryPath.FromString(".");
+        /// var filePaths = new FilePath[] { ".\\test.txt" };
         /// ((ICakeContext)cakeContext).GitAdd(repositoryDirectoryPath, filePaths);
         ///   </code>
         /// </example>
