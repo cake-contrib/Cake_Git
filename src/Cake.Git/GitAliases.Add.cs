@@ -10,6 +10,10 @@ using LibGit2Sharp;
 namespace Cake.Git
 {
     // ReSharper disable once PublicMembersMustHaveComments
+
+    /// <summary>
+    /// Class GitAliases.
+    /// </summary>
     public static partial class GitAliases
     {
         /// <summary>
@@ -18,7 +22,17 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="filePaths">Path to file(s) to add.</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">context
+        /// or
+        /// repositoryDirectoryPath
+        /// </exception>
+        /// <example>
+        ///   <code>
+        /// DirectoryPath repositoryDirectoryPath = DirectoryPath.FromString(".");
+        /// FilePath[] filePaths = new FilePath[] { ".\\test.txt" };
+        /// ((ICakeContext)cakeContext).GitAdd(repositoryDirectoryPath, filePaths);
+        ///   </code>
+        /// </example>
         [CakeMethodAlias]
         [CakeAliasCategory("Add")]
         public static void GitAdd(
