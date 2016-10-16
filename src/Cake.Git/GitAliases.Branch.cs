@@ -7,6 +7,9 @@ using Cake.Git.Extensions;
 
 namespace Cake.Git
 {
+    /// <summary>
+    /// Class GitAliases.
+    /// </summary>
     public static partial class GitAliases
     {
         /// <summary>
@@ -14,7 +17,16 @@ namespace Cake.Git
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
-        /// <returns></returns>
+        /// <returns>GitBranch.</returns>
+        /// <exception cref="ArgumentNullException">context
+        /// or
+        /// repositoryDirectoryPath</exception>
+        /// <example>
+        ///   <code>
+        /// var repositoryDirectoryPath = DirectoryPath.FromString(".");
+        /// var currentBranch = ((ICakeContext)cakeContext).GitBranchCurrent(repositoryDirectoryPath);
+        ///   </code>
+        /// </example>
         [CakeMethodAlias]
         [CakeAliasCategory("Branch")]
         public static GitBranch GitBranchCurrent(this ICakeContext context, DirectoryPath repositoryDirectoryPath)
