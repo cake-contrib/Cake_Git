@@ -1,3 +1,7 @@
+### New in 0.10.0 (Released 2016/10/16)
+* Added GitCloneSettings support
+* Updated documentation
+
 ### New in 0.9.0 (Released 2016/10/12)
 * Added remotes to GitBranch
 
