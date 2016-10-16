@@ -283,7 +283,27 @@ Task("Git-Clone")
 {
     var sourceUrl = "https://github.com/WCOMAB/CakeGitTestRepo.git";
     Information("Cloning repo {0}...", sourceUrl);
+    if (DirectoryExists(testCloneRepo))
+    {
+        ForceDeleteDirectory(testCloneRepo.FullPath);
+    }
     var repo = GitClone(sourceUrl, testCloneRepo);
+    Information("Cloned {0}.", repo);
+});
+
+Task("Git-Clone-WithSettings")
+    .IsDependentOn("Clean")
+    .Does(() =>
+{
+    var sourceUrl = "https://github.com/WCOMAB/CakeGitTestRepo.git";
+    Information("Cloning bare repo {0}...", sourceUrl);
+    if (DirectoryExists(testCloneRepo))
+    {
+        ForceDeleteDirectory(testCloneRepo.FullPath);
+    }
+    var repo = GitClone(sourceUrl, testCloneRepo, new GitCloneSettings {
+        IsBare = true
+    });
     Information("Cloned {0}.", repo);
 });
 
@@ -501,6 +521,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Clone")
+    .IsDependentOn("Git-Clone-WithSettings")
     .IsDependentOn("Git-Diff")
     .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Reset")

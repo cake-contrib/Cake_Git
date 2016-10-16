@@ -72,6 +72,7 @@
     <Compile Include="GitAliases.Tag.cs" />
     <Compile Include="GitBranch.cs" />
     <Compile Include="GitChangeKind.cs" />
+    <Compile Include="GitCloneSettings.cs" />
     <Compile Include="GitCommit.cs" />
     <Compile Include="GitDescribeStrategy.cs" />
     <Compile Include="GitDiffFile.cs" />
