@@ -1,19 +1,15 @@
-﻿using System;
-using Cake.Core;
+﻿using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
 using Cake.Git.Extensions;
 using LibGit2Sharp;
+using System;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 namespace Cake.Git
 {
     // ReSharper disable once PublicMembersMustHaveComments
-
-    /// <summary>
-    /// Class GitAliases.
-    /// </summary>
     public static partial class GitAliases
     {
         /// <summary>
@@ -22,17 +18,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="filePaths">Path to file(s) to add.</param>
-        /// <exception cref="ArgumentNullException">context
-        /// or
-        /// repositoryDirectoryPath
-        /// </exception>
-        /// <example>
-        ///   <code>
-        /// var repositoryDirectoryPath = DirectoryPath.FromString(".");
-        /// var filePaths = new FilePath[] { ".\\test.txt" };
-        /// ((ICakeContext)cakeContext).GitAdd(repositoryDirectoryPath, filePaths);
-        ///   </code>
-        /// </example>
+        /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Add")]
         public static void GitAdd(
@@ -50,13 +36,42 @@ namespace Cake.Git
             {
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
-            
+
             context.UseRepository(
                 repositoryDirectoryPath,
                 repository => Commands.Stage(
                     repository,
                     filePaths.ToRelativePathStrings(context, repositoryDirectoryPath)
                     )
+                );
+        }
+
+        /// <summary>
+        /// Add all file changes to index.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Path to repository.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Add")]
+        public static void GitAddAll(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath
+            )
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (repositoryDirectoryPath == null)
+            {
+                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
+            }
+
+            context.UseRepository(
+                repositoryDirectoryPath,
+                repository => Commands.Stage(repository, "*")
                 );
         }
     }

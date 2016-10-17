@@ -249,12 +249,35 @@ Task("Modify-Test-Files")
         .ToArray();
 });
 
+Task("Modify-More-Test-Files")
+    .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-Remove-Commit")
+    .Does(() =>
+{
+    testModifyFiles = testFiles
+        .Except(testDeleteFiles)
+        .Select(modifyFilePath => {
+            Information("Modifying file {0}...", modifyFilePath);
+            CreateRandomDataFile(Context, modifyFilePath);
+            return modifyFilePath;
+            })
+        .ToArray();
+});
+
 Task("Git-Modify-Add")
     .IsDependentOn("Modify-Test-Files")
     .Does(() =>
 {
     Information("Adding modified test files...");
     GitAdd(testInitalRepo, testModifyFiles);
+});
+
+Task("Git-Modify-AddAll")
+    .IsDependentOn("Modify-More-Test-Files")
+    .Does(() =>
+{
+    Information("Adding modified test files...");
+    GitAddAll(testInitalRepo);
 });
 
 Task("Git-Modify-Commit")
@@ -518,6 +541,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-Remove-Diff")
     .IsDependentOn("Modify-Test-Files")
     .IsDependentOn("Git-Modify-Add")
+    .IsDependentOn("Git-Modify-AddAll")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Clone")
@@ -542,6 +566,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-Remove-Diff")
     .IsDependentOn("Modify-Test-Files")
     .IsDependentOn("Git-Modify-Add")
+    .IsDependentOn("Git-Modify-AddAll")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Diff")
