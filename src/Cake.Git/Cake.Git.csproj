@@ -72,11 +72,13 @@
     <Compile Include="GitAliases.Tag.cs" />
     <Compile Include="GitBranch.cs" />
     <Compile Include="GitChangeKind.cs" />
+    <Compile Include="GitCloneSettings.cs" />
     <Compile Include="GitCommit.cs" />
     <Compile Include="GitDescribeStrategy.cs" />
     <Compile Include="GitDiffFile.cs" />
     <Compile Include="GitMergeResult.cs" />
     <Compile Include="GitMergeStatus.cs" />
+    <Compile Include="GitRemote.cs" />
     <Compile Include="GitResetMode.cs" />
     <Compile Include="GitSignature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

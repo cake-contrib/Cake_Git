@@ -249,12 +249,35 @@ Task("Modify-Test-Files")
         .ToArray();
 });
 
+Task("Modify-More-Test-Files")
+    .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-Remove-Commit")
+    .Does(() =>
+{
+    testModifyFiles = testFiles
+        .Except(testDeleteFiles)
+        .Select(modifyFilePath => {
+            Information("Modifying file {0}...", modifyFilePath);
+            CreateRandomDataFile(Context, modifyFilePath);
+            return modifyFilePath;
+            })
+        .ToArray();
+});
+
 Task("Git-Modify-Add")
     .IsDependentOn("Modify-Test-Files")
     .Does(() =>
 {
     Information("Adding modified test files...");
     GitAdd(testInitalRepo, testModifyFiles);
+});
+
+Task("Git-Modify-AddAll")
+    .IsDependentOn("Modify-More-Test-Files")
+    .Does(() =>
+{
+    Information("Adding modified test files...");
+    GitAddAll(testInitalRepo);
 });
 
 Task("Git-Modify-Commit")
@@ -283,7 +306,27 @@ Task("Git-Clone")
 {
     var sourceUrl = "https://github.com/WCOMAB/CakeGitTestRepo.git";
     Information("Cloning repo {0}...", sourceUrl);
+    if (DirectoryExists(testCloneRepo))
+    {
+        ForceDeleteDirectory(testCloneRepo.FullPath);
+    }
     var repo = GitClone(sourceUrl, testCloneRepo);
+    Information("Cloned {0}.", repo);
+});
+
+Task("Git-Clone-WithSettings")
+    .IsDependentOn("Clean")
+    .Does(() =>
+{
+    var sourceUrl = "https://github.com/WCOMAB/CakeGitTestRepo.git";
+    Information("Cloning bare repo {0}...", sourceUrl);
+    if (DirectoryExists(testCloneRepo))
+    {
+        ForceDeleteDirectory(testCloneRepo.FullPath);
+    }
+    var repo = GitClone(sourceUrl, testCloneRepo, new GitCloneSettings {
+        IsBare = true
+    });
     Information("Cloned {0}.", repo);
 });
 
@@ -416,6 +459,13 @@ Task("Git-Current-Branch")
     Information("Current branch: {0}", branch);
 });
 
+Task("Git-Remote-Branch")
+    .Does(() =>
+{
+    var branch = GitBranchCurrent(".");
+    Information("Remote branch: {0}", branch);
+});
+
 Task("Git-Checkout")
     .Does(() =>
 {
@@ -491,14 +541,17 @@ Task("Default-Tests")
     .IsDependentOn("Git-Remove-Diff")
     .IsDependentOn("Modify-Test-Files")
     .IsDependentOn("Git-Modify-Add")
+    .IsDependentOn("Git-Modify-AddAll")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Clone")
+    .IsDependentOn("Git-Clone-WithSettings")
     .IsDependentOn("Git-Diff")
     .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout");
 
 Task("Local-Tests")
@@ -513,6 +566,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-Remove-Diff")
     .IsDependentOn("Modify-Test-Files")
     .IsDependentOn("Git-Modify-Add")
+    .IsDependentOn("Git-Modify-AddAll")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Diff")
@@ -520,6 +574,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout");
 
 ///////////////////////////////////////////////////////////////////////////////
