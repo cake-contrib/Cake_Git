@@ -15,6 +15,12 @@ namespace Cake.Git
         /// <summary>
         /// Remove file(s) from index.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var filePaths = new FilePath[] { ".\\test.txt" };
+        ///     GitRemove("c:/temp/cake", true, filePaths);
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="filePaths">Path to file(s) to remove.</param>

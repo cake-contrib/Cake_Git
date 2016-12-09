@@ -17,6 +17,11 @@ namespace Cake.Git
         /// <summary>
         /// Pull unauthenticated using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitPull("c:/temp/cake", "name", "email");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <param name="mergerName">The name of the merger.</param>
@@ -69,6 +74,11 @@ namespace Cake.Git
         /// <summary>
         /// Pull authenticating using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitPull("c:/temp/cake", "name", "email", "username", "password", "remote");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <param name="mergerName">The name of the merger.</param>

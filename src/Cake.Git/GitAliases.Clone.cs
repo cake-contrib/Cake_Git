@@ -15,6 +15,11 @@ namespace Cake.Git
         /// <summary>
         /// Clone unauthenticated using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitClone("https://github.com/cake-build/cake.git", "c:/temp/cake");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="sourceUrl">URI for the remote repository.</param>
         /// <param name="workDirectoryPath">Local path to clone into.</param>
@@ -66,6 +71,12 @@ namespace Cake.Git
         /// <summary>
         /// Clone unauthenticated using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitClone("https://github.com/cake-build/cake.git", "c:/temp/cake", 
+        ///         new GitCloneSettings{ BranchName = "main" });
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="sourceUrl">URI for the remote repository.</param>
         /// <param name="workDirectoryPath">Local path to clone into.</param>
@@ -123,6 +134,14 @@ namespace Cake.Git
         /// <summary>
         /// Clone authenticated using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitClone("https://github.com/cake-build/cake.git", 
+        ///         "c:/temp/cake", 
+        ///         "username", 
+        ///         "password");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="sourceUrl">URI for the remote repository.</param>
         /// <param name="workDirectoryPath">Local path to clone into.</param>
@@ -185,6 +204,15 @@ namespace Cake.Git
         /// <summary>
         /// Clone authenticated using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitClone("https://github.com/cake-build/cake.git", 
+        ///         "c:/temp/cake", 
+        ///         "username", 
+        ///         "password",
+        ///         new GitCloneSettings{ BranchName = "main" });
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="sourceUrl">URI for the remote repository.</param>
         /// <param name="workDirectoryPath">Local path to clone into.</param>

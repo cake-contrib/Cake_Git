@@ -16,6 +16,11 @@ namespace Cake.Git
         /// <summary>
         /// Get changed files from inital commit id up to current.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitDiff("c:/temp/cake");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <returns>The path to the created repository.</returns>
@@ -37,6 +42,11 @@ namespace Cake.Git
         /// <summary>
         /// Get changed files from certain commit id up to current.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitDiff("c:/temp/cake", "since commit id");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="sinceCommitId">Commit id to start fetching from.</param>
@@ -60,6 +70,11 @@ namespace Cake.Git
         /// <summary>
         /// Get changed files from certain commit id up to current.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitDiff("c:/temp/cake", "since commit id", "to commit id");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="sinceCommitId">Commit id to start fetching from.</param>

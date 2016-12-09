@@ -15,6 +15,11 @@ namespace Cake.Git
         /// <summary>
         /// Applys tagName to repository.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitTag("c:/temp/cake", "tag name");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="tagName">The tag name.</param>
@@ -51,6 +56,11 @@ namespace Cake.Git
         /// <summary>
         /// Applys tagName to repository.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitTag("c:/temp/cake", "tag name", "objectish");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="tagName">The tag name.</param>

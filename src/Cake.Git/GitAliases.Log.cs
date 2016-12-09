@@ -18,6 +18,11 @@ namespace Cake.Git
         /// <summary>
         /// Get last commit
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitLogTip("c:/temp/cake");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <returns>The path to the created repository.</returns>
@@ -48,6 +53,11 @@ namespace Cake.Git
         /// <summary>
         /// Get commit log.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitLog("c:/temp/cake", 5);
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="count">Number of commits to fetch.</param>
@@ -83,6 +93,11 @@ namespace Cake.Git
         /// <summary>
         /// Get commit from certain commit id up to current.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitLog("c:/temp/cake", "since commit id");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="sinceCommitId">Commit id to start fetching from.</param>
@@ -130,6 +145,11 @@ namespace Cake.Git
         /// <summary>
         /// Get specific commit.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitLogLookup("c:/temp/cake", "commit id");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="commitId">Commit id to lookup.</param>

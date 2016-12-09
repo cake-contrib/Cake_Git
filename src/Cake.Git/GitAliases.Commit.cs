@@ -16,6 +16,11 @@ namespace Cake.Git
         /// <summary>
         /// Commit using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitCommit("c:/temp/cake", "name", "email", "message");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="name">Name of committer.</param>

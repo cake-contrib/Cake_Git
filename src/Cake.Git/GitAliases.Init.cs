@@ -16,6 +16,11 @@ namespace Cake.Git
         /// <summary>
         /// Init using default options.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitInit("c:/temp/cake");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="initDirectoryPath">The path to the working folder when initializing a standard ".git" repository.</param>
         /// <returns>The path to the created repository.</returns>

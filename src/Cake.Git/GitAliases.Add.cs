@@ -15,6 +15,12 @@ namespace Cake.Git
         /// <summary>
         /// Add file to index.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var filePaths = new FilePath[] { ".\\test.txt" };
+        ///     GitAdd("c:/temp/cake", filePaths);
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="filePaths">Path to file(s) to add.</param>
@@ -49,6 +55,11 @@ namespace Cake.Git
         /// <summary>
         /// Add all file changes to index.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitAddAll("c:/temp/cake");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <exception cref="ArgumentNullException"></exception>
