@@ -14,6 +14,11 @@ namespace Cake.Git
         /// Sets the current branch head (HEAD) to a specified commit, 
         /// optionally modifying index and working tree to match.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitReset("c:/temp/cake", GitResetMode.Hard, "commit id");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="mode">The effect that the reset action should have on the the index and working tree.</param>
@@ -43,6 +48,11 @@ namespace Cake.Git
         /// <summary>
         /// Resets the current branch head (HEAD) optionally modifying index and working tree to match.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitReset("c:/temp/cake", GitResetMode.Hard);
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="mode">The effect that the reset action should have on the the index and working tree.</param>

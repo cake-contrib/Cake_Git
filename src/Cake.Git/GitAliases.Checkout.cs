@@ -16,6 +16,12 @@ namespace Cake.Git
         /// <summary>
         /// Checkout file(s) using supplied commit or branch spec.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var filePaths = new FilePath[] { ".\\test.txt" };
+        ///     GitCheckout("c:/temp/cake", "develop", filePaths);
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="committishOrBranchSpec">A revparse spec for the commit or branch to checkout paths from.</param>
@@ -71,6 +77,12 @@ namespace Cake.Git
         /// <summary>
         /// Checkout file.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var filePaths = new FilePath[] { ".\\test.txt" };
+        ///     GitCheckout("c:/temp/cake", filePaths);
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="filePaths">Path to files to remove.</param>

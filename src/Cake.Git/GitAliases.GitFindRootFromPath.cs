@@ -12,6 +12,11 @@ namespace Cake.Git
         /// <summary>
         /// Finding git root path from subtree.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitFindRootFromPath("c:/temp/cake");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="path">Path to probe the repository.</param>
         /// <returns>The path to the repository root.</returns>

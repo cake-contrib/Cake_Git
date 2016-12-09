@@ -16,6 +16,11 @@ namespace Cake.Git
         /// <summary>
         /// Push all branches unauthenticated.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitPush("c:/temp/cake");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -55,6 +60,11 @@ namespace Cake.Git
         /// <summary>
         /// Push all branches authenticated.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitPush("c:/temp/cake", "username", "password");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <param name="username">Username used for authentication.</param>
@@ -108,6 +118,11 @@ namespace Cake.Git
         /// <summary>
         /// Push specific branch authenticated.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitPush("c:/temp/cake", "username", "password", "branch");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <param name="username">Username used for authentication.</param>
@@ -171,6 +186,11 @@ namespace Cake.Git
         /// <summary>
         /// Push a tag to a remote unauthenticated.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitPushRef("c:/temp/cake", "remote", "refSpec");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <param name="remote">The <see cref="T:LibGit2Sharp.Remote"/> to push to.</param>
@@ -223,6 +243,11 @@ namespace Cake.Git
         /// <summary>
         /// Push a tag to a remote authenticated.
         /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitPushRef("c:/temp/cake", "username", "password", "remote", "refSpec");
+        /// </code>
+        /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Repository path.</param>
         /// <param name="username">Username used for authentication.</param>
