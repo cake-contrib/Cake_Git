@@ -27,7 +27,7 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(mergeResult));
             }
 
-            Commit = new GitCommit(mergeResult.Commit);
+            Commit = (mergeResult.Commit==null) ? null : new GitCommit(mergeResult.Commit);
             Status = (GitMergeStatus) mergeResult.Status;
         }
     }

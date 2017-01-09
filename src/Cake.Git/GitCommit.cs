@@ -1,3 +1,4 @@
+using System;
 using LibGit2Sharp;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -50,6 +51,11 @@ namespace Cake.Git
 
         internal GitCommit(Commit commit)
         {
+            if (commit == null)
+            {
+                throw new ArgumentException("Source commit can't be null.", nameof(commit));
+            }
+
             Sha = commit.Sha;
             Author = new GitSignature(commit.Author.Email, commit.Author.Name, commit.Author.When);
             Committer = new GitSignature(commit.Committer.Email, commit.Committer.Name, commit.Committer.When);

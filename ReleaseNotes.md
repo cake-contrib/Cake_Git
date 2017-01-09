@@ -1,3 +1,7 @@
+### New in 0.12.0 (Released 2017/01/09)
+
+* Fixed null issue in GitPull alias
+
 ### New in 0.11.0 (Released 2016/12/09)
 
 * Updated documentation
