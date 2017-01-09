@@ -1,5 +1,4 @@
-﻿#addin "Cake.Slack"
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -89,14 +88,6 @@ Setup(ctx =>
                             );
 
     Information(buildStartMessage);
-    if(!string.IsNullOrEmpty(GitHookUri))
-    {
-        Slack.Chat.PostMessage(
-                channel:GitChannel,
-                text:buildStartMessage,
-                messageSettings:new SlackChatMessageSettings { IncomingWebHookUrl = GitHookUri }
-            );
-    }
 });
 
 Teardown(ctx =>
@@ -119,6 +110,9 @@ Task("Clean")
         CleanDirectories(path + "/**/bin/" + configuration);
         CleanDirectories(path + "/**/obj/" + configuration);
     }
+
+    Information("Cleaning {0}", nugetRoot);
+    CleanDirectory(MakeAbsolute(Directory(nugetRoot)));
 });
 
 Task("Restore")
@@ -171,11 +165,30 @@ Task("Build")
     }
 });
 
-Task("Test")
+Task("Create-NuGet-Package")
     .IsDependentOn("Build")
+    .Does(() =>
+{
+    if (!DirectoryExists(nugetRoot))
+    {
+        CreateDirectory(nugetRoot);
+    }
+    NuGetPack(nuGetPackSettings);
+});
+
+Task("Test")
+    .IsDependentOn("Create-NuGet-Package")
     .WithCriteria(() => StringComparer.OrdinalIgnoreCase.Equals(configuration, "Release"))
     .Does(() =>
 {
+    var package = nugetRoot + "Cake.Git." + semVersion + ".nupkg";
+    var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git/Cake.Git"));
+    if (DirectoryExists(addinDir))
+    {
+        DeleteDirectory(addinDir, true);
+    }
+    Unzip(package, addinDir);
+
     Action executeTests = ()=> CakeExecuteScript("./test.cake", new CakeSettings{ Arguments = new Dictionary<string, string>{{"target", target == "Default" ? "Default-Tests" : "Local-Tests"}}});
     if (TravisCI.IsRunningOnTravisCI)
     {
@@ -189,20 +202,11 @@ Task("Test")
     executeTests();
 });
 
-Task("Create-NuGet-Package")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test")
-    .Does(() =>
-{
-    if (!DirectoryExists(nugetRoot))
-    {
-        CreateDirectory(nugetRoot);
-    }
-    NuGetPack(nuGetPackSettings);
-});
+
 
 Task("Publish-MyGet")
     .IsDependentOn("Create-NuGet-Package")
+    .IsDependentOn("Test")
     .WithCriteria(() => !isLocalBuild)
     .WithCriteria(() => !isPullRequest)
     .Does(() =>
@@ -230,10 +234,12 @@ Task("Publish-MyGet")
 
 
 Task("Default")
-    .IsDependentOn("Create-NuGet-Package");
+    .IsDependentOn("Create-NuGet-Package")
+    .IsDependentOn("Test");
 
 Task("Local-Tests")
-    .IsDependentOn("Create-NuGet-Package");
+    .IsDependentOn("Create-NuGet-Package")
+    .IsDependentOn("Test");
 
 Task("AppVeyor")
     .IsDependentOn("Publish-MyGet");

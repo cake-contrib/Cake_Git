@@ -1,5 +1,4 @@
-#r "./src/Cake.Git/bin/Release/LibGit2Sharp.dll"
-#r "./src/Cake.Git/bin/Release/Cake.Git.dll"
+#addin "Cake.Git"
 using System.Security.Cryptography;
 
 ///////////////////////////////////////////////////////////////////////////////
