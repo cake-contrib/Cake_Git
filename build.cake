@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -8,23 +8,22 @@ var configuration   = Argument<string>("configuration", "Release");
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 ///////////////////////////////////////////////////////////////////////////////
-var GitHookUri        = EnvironmentVariable("Githookuri");
-var GitChannel        = "#cake";
 var isLocalBuild        = !AppVeyor.IsRunningOnAppVeyor;
 var isPullRequest       = AppVeyor.Environment.PullRequest.IsPullRequest;
 var solutions           = GetFiles("./**/*.sln");
 var solutionPaths       = solutions.Select(solution => solution.GetDirectory());
 var releaseNotes        = ParseReleaseNotes("./ReleaseNotes.md");
 var version             = releaseNotes.Version.ToString();
-var binDir              = "./src/Cake.Git/bin/" + configuration;
+var binDir              = MakeAbsolute(Directory("./src/Cake.Git/bin/" + configuration));
 var nugetRoot           = "./nuget/";
 var semVersion          = isLocalBuild
                                 ? version
                                 : string.Concat(version, "-build-", AppVeyor.Environment.Build.Number.ToString("0000"));
+
 var assemblyInfo        = new AssemblyInfoSettings {
                                 Title                   = "Cake.Git",
                                 Description             = "Cake Git AddIn",
-                                Product                 = "Cake.Git",
+                               Product                 = "Cake.Git",
                                 Company                 = "WCOM AB",
                                 Version                 = version,
                                 FileVersion             = version,
@@ -51,10 +50,9 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 NoPackageAnalysis       = true,
                                 Files                   = new [] {
                                                                     new NuSpecContent {Source = "Cake.Git.dll"},
-                                                                    new NuSpecContent {Source = "Cake.Git.pdb"},
+                                                                    IsRunningOnUnix() ? new NuSpecContent {Source = "Cake.Git.dll.mdb"} : new NuSpecContent {Source = "Cake.Git.pdb"},
                                                                     new NuSpecContent {Source = "Cake.Git.xml"},
                                                                     new NuSpecContent {Source = "LibGit2Sharp.dll"},
-                                                                    new NuSpecContent {Source = "LibGit2Sharp.xml"},
                                                                     new NuSpecContent {Source = "lib/linux/x86_64/libgit2-75db289.so", Target = "lib/linux/x86_64/libgit2-75db289.so"},
                                                                     new NuSpecContent {Source = "lib/osx/libgit2-75db289.dylib", Target = "lib/osx/libgit2-75db289.dylib"},
                                                                     new NuSpecContent {Source = "lib/win32/x64/git2-75db289.dll", Target = "lib/win32/x64/git2-75db289.dll"},
@@ -65,6 +63,8 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 BasePath                = binDir,
                                 OutputDirectory         = nugetRoot
                             };
+
+Context.Tools.RegisterFile("./tools/nuget.exe");
 
 if (!isLocalBuild)
 {
@@ -169,6 +169,12 @@ Task("Create-NuGet-Package")
     .IsDependentOn("Build")
     .Does(() =>
 {
+    nuGetPackSettings.Files = GetFiles(binDir + "/**/*")
+                                .Where(file=>!file.FullPath.Contains("Cake.Core."))
+                                .Select(file=>file.FullPath.Substring(binDir.FullPath.Length+1))
+                                .Select(file=>new NuSpecContent {Source = file, Target = file})
+                                .ToArray();
+
     if (!DirectoryExists(nugetRoot))
     {
         CreateDirectory(nugetRoot);
@@ -182,7 +188,7 @@ Task("Test")
     .Does(() =>
 {
     var package = nugetRoot + "Cake.Git." + semVersion + ".nupkg";
-    var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git/Cake.Git"));
+    var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git"));
     if (DirectoryExists(addinDir))
     {
         DeleteDirectory(addinDir, true);

@@ -58,19 +58,9 @@ if ((Test-Path $PSScriptRoot) -and !(Test-Path $TOOLS_DIR)) {
     New-Item -path $TOOLS_DIR -name logfiles -itemtype directory
 }
 
-# Try find NuGet.exe in path if not exists
-if (!(Test-Path $NUGET_EXE)) {
-    "Trying to find nuget.exe in path"
-    $NUGET_EXE_IN_PATH = &where.exe nuget.exe
-    if ($NUGET_EXE_IN_PATH -ne $null -and (Test-Path $NUGET_EXE_IN_PATH)) {
-        "Found $($NUGET_EXE_IN_PATH)"
-        $NUGET_EXE = $NUGET_EXE_IN_PATH
-    }
-}
-
 # Try download NuGet.exe if not exists
 if (!(Test-Path $NUGET_EXE)) {
-    Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $NUGET_EXE
+    Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile $NUGET_EXE
 }
 
 # Make sure NuGet exists where we expect it.

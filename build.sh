@@ -19,6 +19,8 @@ DRYRUN=
 SHOW_VERSION=false
 SCRIPT_ARGUMENTS=()
 
+export PATH=$TOOLS_DIR:$PATH
+
 # Parse arguments.
 for i in "$@"; do
     case $1 in
