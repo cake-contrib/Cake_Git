@@ -104,6 +104,28 @@ Task("Git-Init")
     Information("Repository created {0}.", repo);
 });
 
+Task("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-Init")
+    .Does(() =>
+{
+    Information("Checking if local repository is recognized as a valid repository...");
+    if (!GitIsValidRepository(testInitalRepo)) {
+        throw new Exception(string.Format("Initialized repository at '{0}' is not a valid Git repository.",
+            testInitalRepo));
+    }
+});
+
+Task("Git-IsValidRepository-TempDirectory")
+    .Does(() =>
+{
+    Information("Checking if temp directory is not reported as a valid repository...");
+    var tempPath = System.IO.Path.GetTempPath();
+    if (GitIsValidRepository(tempPath)) {
+        throw new Exception(string.Format("Path at '{0}' should not be a valid Git repository.",
+            tempPath));
+    }
+});
+
 Task("Create-Test-Files")
     .IsDependentOn("Git-Init")
     .Does(() =>
@@ -528,8 +550,14 @@ Task("Git-Reset")
     .IsDependentOn("Git-Reset-Stage-File")
     .IsDependentOn("Git-Reset-Hard");
 
+Task("Git-IsValidRepository")
+    .IsDependentOn("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-IsValidRepository-TempDirectory");
+
 Task("Default-Tests")
     .IsDependentOn("Git-Init")
+    .IsDependentOn("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
     .IsDependentOn("Git-Init-Commit")
@@ -555,6 +583,8 @@ Task("Default-Tests")
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
+    .IsDependentOn("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
     .IsDependentOn("Git-Init-Commit")
