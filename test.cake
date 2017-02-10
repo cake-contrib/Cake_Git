@@ -166,6 +166,28 @@ Task("Git-Init-Commit")
     Information("Commit created:\r\n{0}", initalCommit);
 });
 
+Task("Git-HasUncommitedChanges-Dirty")
+    .IsDependentOn("Git-Init-Add")
+    .Does(() =>
+{
+    Information("Checking if repository has uncommited changes...");
+    if (!GitHasUncommitedChanges(testInitalRepo)) 
+    {
+        throw new Exception("Repository doesn't report uncommited changes.");
+    };
+});
+
+Task("Git-HasUncommitedChanges-Clean")
+    .IsDependentOn("Git-Init-Commit")
+    .Does(() =>
+{
+    Information("Checking if repository has uncommited changes...");
+    if (GitHasUncommitedChanges(testInitalRepo)) 
+    {
+        throw new Exception("Repository reports uncommited changes after commiting all files.");
+    };
+});
+
 Task("Git-Init-Diff")
     .IsDependentOn("Git-Init-Commit")
     .Does(() =>
@@ -554,13 +576,19 @@ Task("Git-IsValidRepository")
     .IsDependentOn("Git-IsValidRepository-LocalRepo")
     .IsDependentOn("Git-IsValidRepository-TempDirectory");
 
+Task("Git-HasUncommitedChanges")
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")
+    .IsDependentOn("Git-HasUncommitedChanges-Clean");
+
 Task("Default-Tests")
     .IsDependentOn("Git-Init")
     .IsDependentOn("Git-IsValidRepository-LocalRepo")
     .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")    
     .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-HasUncommitedChanges-Clean")    
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
     .IsDependentOn("Git-Remove")
@@ -587,7 +615,9 @@ Task("Local-Tests")
     .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")    
     .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-HasUncommitedChanges-Clean")    
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
     .IsDependentOn("Git-Remove")
