@@ -1,3 +1,9 @@
+### New in 0.13.0 (Released 2017/02/21)
+
+* Added GitIsValidRepository Alias
+* Added GitHasUncommitedChanges alias
+* Fixed link in Nuspec
+
 ### New in 0.12.0 (Released 2017/01/09)
 
 * Fixed null issue in GitPull alias

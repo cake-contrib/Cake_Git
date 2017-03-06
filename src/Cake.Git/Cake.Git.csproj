@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GitAliases.Repository.cs" />
     <Compile Include="GitAliases.Reset.cs" />
     <Compile Include="GitAliases.Branch.cs" />
     <Compile Include="GitAliases.Checkout.cs" />
@@ -64,7 +65,6 @@
     <Compile Include="GitAliases.cs" />
     <Compile Include="GitAliases.Describe.cs" />
     <Compile Include="GitAliases.Diff.cs" />
-    <Compile Include="GitAliases.GitFindRootFromPath.cs" />
     <Compile Include="GitAliases.Init.cs" />
     <Compile Include="GitAliases.Log.cs" />
     <Compile Include="GitAliases.Pull.cs" />

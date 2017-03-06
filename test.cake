@@ -104,6 +104,28 @@ Task("Git-Init")
     Information("Repository created {0}.", repo);
 });
 
+Task("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-Init")
+    .Does(() =>
+{
+    Information("Checking if local repository is recognized as a valid repository...");
+    if (!GitIsValidRepository(testInitalRepo)) {
+        throw new Exception(string.Format("Initialized repository at '{0}' is not a valid Git repository.",
+            testInitalRepo));
+    }
+});
+
+Task("Git-IsValidRepository-TempDirectory")
+    .Does(() =>
+{
+    Information("Checking if temp directory is not reported as a valid repository...");
+    var tempPath = System.IO.Path.GetTempPath();
+    if (GitIsValidRepository(tempPath)) {
+        throw new Exception(string.Format("Path at '{0}' should not be a valid Git repository.",
+            tempPath));
+    }
+});
+
 Task("Create-Test-Files")
     .IsDependentOn("Git-Init")
     .Does(() =>
@@ -142,6 +164,28 @@ Task("Git-Init-Commit")
     Information("Committing files...");
     initalCommit = GitCommit(testInitalRepo, "John Doe", "john@doe.com", "Inital commit");
     Information("Commit created:\r\n{0}", initalCommit);
+});
+
+Task("Git-HasUncommitedChanges-Dirty")
+    .IsDependentOn("Git-Init-Add")
+    .Does(() =>
+{
+    Information("Checking if repository has uncommited changes...");
+    if (!GitHasUncommitedChanges(testInitalRepo)) 
+    {
+        throw new Exception("Repository doesn't report uncommited changes.");
+    };
+});
+
+Task("Git-HasUncommitedChanges-Clean")
+    .IsDependentOn("Git-Init-Commit")
+    .Does(() =>
+{
+    Information("Checking if repository has uncommited changes...");
+    if (GitHasUncommitedChanges(testInitalRepo)) 
+    {
+        throw new Exception("Repository reports uncommited changes after commiting all files.");
+    };
 });
 
 Task("Git-Init-Diff")
@@ -528,11 +572,23 @@ Task("Git-Reset")
     .IsDependentOn("Git-Reset-Stage-File")
     .IsDependentOn("Git-Reset-Hard");
 
+Task("Git-IsValidRepository")
+    .IsDependentOn("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-IsValidRepository-TempDirectory");
+
+Task("Git-HasUncommitedChanges")
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")
+    .IsDependentOn("Git-HasUncommitedChanges-Clean");
+
 Task("Default-Tests")
     .IsDependentOn("Git-Init")
+    .IsDependentOn("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")    
     .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-HasUncommitedChanges-Clean")    
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
     .IsDependentOn("Git-Remove")
@@ -555,9 +611,13 @@ Task("Default-Tests")
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
+    .IsDependentOn("Git-IsValidRepository-LocalRepo")
+    .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")    
     .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-HasUncommitedChanges-Clean")    
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
     .IsDependentOn("Git-Remove")
