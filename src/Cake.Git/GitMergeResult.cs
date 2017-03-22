@@ -27,8 +27,9 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(mergeResult));
             }
 
-            Commit = (mergeResult.Commit==null) ? null : new GitCommit(mergeResult.Commit);
             Status = (GitMergeStatus) mergeResult.Status;
+            var skipDetails = Status!= GitMergeStatus.NonFastForward;
+            Commit = skipDetails||mergeResult.Commit == null ? null : new GitCommit(mergeResult.Commit);
         }
     }
 }

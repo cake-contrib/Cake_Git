@@ -1,3 +1,8 @@
+### New in 0.14.0 (Released 2017/03/22)
+
+* Only fetch merge commit for non fast forward, fixes GitPull issue
+* Changed to LibGit Portable
+
 ### New in 0.13.0 (Released 2017/02/21)
 
 * Added GitIsValidRepository Alias
