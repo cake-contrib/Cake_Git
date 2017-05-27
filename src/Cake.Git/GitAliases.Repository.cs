@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
@@ -80,6 +81,43 @@ namespace Cake.Git
             return context.UseRepository(
                 path,
                 repository => repository.RetrieveStatus().IsDirty);
+        }
+
+        /// <summary>
+        /// Checks if a repository contains indexed changes.
+        /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitHasIndexedChanges("c:/temp/cake");
+        /// </code>
+        /// </example>
+        /// <param name="context">The context.</param>
+        /// <param name="path">Path to the repository to check.</param>
+        /// <returns>True if the Git repository contains uncommited changes.</returns>
+        /// <exception cref="ArgumentNullException">If any of the parameters are null.</exception>
+        /// <exception cref="RepositoryNotFoundException">If path doesn't exist.</exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Repository")]
+        public static bool GitHasIndexedChanges(this ICakeContext context, DirectoryPath path)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (!context.FileSystem.Exist(path))
+            {
+                throw new RepositoryNotFoundException($"Path '{path}' doesn't exists.");
+            }
+
+            return context.UseRepository(
+                path,
+                repository => repository.RetrieveStatus().Staged.Any());
         }
 
         /// <summary>

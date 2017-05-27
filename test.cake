@@ -323,6 +323,23 @@ Task("Git-Modify-AddAll")
     GitAddAll(testInitalRepo);
 });
 
+Task("Git-Modify-Unstage")
+    .IsDependentOn("Git-Modify-Add")
+    .Does(() =>
+{
+    Information("Unstaging added test files...");
+    if (!GitHasIndexedChanges(testInitalRepo)) 
+    {
+        throw new Exception("Repository doesn't report indexed changes.");
+    };
+    GitUnstageAll(testInitalRepo);
+    if (GitHasIndexedChanges(testInitalRepo)) 
+    {
+        throw new Exception("Repository does report indexed changes.");
+    };
+    GitAdd(testInitalRepo, testModifyFiles);
+});
+
 Task("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Add")
     .Does(() =>
@@ -586,9 +603,9 @@ Task("Default-Tests")
     .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
-    .IsDependentOn("Git-HasUncommitedChanges-Dirty")    
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")
     .IsDependentOn("Git-Init-Commit")
-    .IsDependentOn("Git-HasUncommitedChanges-Clean")    
+    .IsDependentOn("Git-HasUncommitedChanges-Clean")
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
     .IsDependentOn("Git-Remove")
@@ -597,6 +614,7 @@ Task("Default-Tests")
     .IsDependentOn("Modify-Test-Files")
     .IsDependentOn("Git-Modify-Add")
     .IsDependentOn("Git-Modify-AddAll")
+    .IsDependentOn("Git-Modify-Unstage")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Clone")
@@ -615,9 +633,9 @@ Task("Local-Tests")
     .IsDependentOn("Git-IsValidRepository-TempDirectory")
     .IsDependentOn("Create-Test-Files")
     .IsDependentOn("Git-Init-Add")
-    .IsDependentOn("Git-HasUncommitedChanges-Dirty")    
+    .IsDependentOn("Git-HasUncommitedChanges-Dirty")
     .IsDependentOn("Git-Init-Commit")
-    .IsDependentOn("Git-HasUncommitedChanges-Clean")    
+    .IsDependentOn("Git-HasUncommitedChanges-Clean")
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
     .IsDependentOn("Git-Remove")
@@ -626,6 +644,7 @@ Task("Local-Tests")
     .IsDependentOn("Modify-Test-Files")
     .IsDependentOn("Git-Modify-Add")
     .IsDependentOn("Git-Modify-AddAll")
+    .IsDependentOn("Git-Modify-Unstage")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Diff")
