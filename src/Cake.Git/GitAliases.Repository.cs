@@ -84,21 +84,21 @@ namespace Cake.Git
         }
 
         /// <summary>
-        /// Checks if a repository contains indexed changes.
+        /// Checks if a repository contains staged changes.
         /// </summary>
         /// <example>
         /// <code>
-        ///     var result = GitHasIndexedChanges("c:/temp/cake");
+        ///     var result = GitHasStagedChanges("c:/temp/cake");
         /// </code>
         /// </example>
         /// <param name="context">The context.</param>
         /// <param name="path">Path to the repository to check.</param>
-        /// <returns>True if the Git repository contains uncommited changes.</returns>
+        /// <returns>True if the Git repository contains staged changes.</returns>
         /// <exception cref="ArgumentNullException">If any of the parameters are null.</exception>
         /// <exception cref="RepositoryNotFoundException">If path doesn't exist.</exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Repository")]
-        public static bool GitHasIndexedChanges(this ICakeContext context, DirectoryPath path)
+        public static bool GitHasStagedChanges(this ICakeContext context, DirectoryPath path)
         {
             if (context == null)
             {

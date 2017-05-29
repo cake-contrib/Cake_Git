@@ -328,12 +328,12 @@ Task("Git-Modify-Unstage")
     .Does(() =>
 {
     Information("Unstaging added test files...");
-    if (!GitHasIndexedChanges(testInitalRepo)) 
+    if (!GitHasStagedChanges(testInitalRepo)) 
     {
         throw new Exception("Repository doesn't report indexed changes.");
     };
     GitUnstageAll(testInitalRepo);
-    if (GitHasIndexedChanges(testInitalRepo)) 
+    if (GitHasStagedChanges(testInitalRepo)) 
     {
         throw new Exception("Repository does report indexed changes.");
     };
