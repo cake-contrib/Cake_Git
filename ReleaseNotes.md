@@ -1,3 +1,8 @@
+### New in 0.15.0 (Released 2017/06/01)
+
+* Added GitHasStagedChanges alias
+* Included license in nuget package
+
 ### New in 0.14.0 (Released 2017/03/22)
 
 * Only fetch merge commit for non fast forward, fixes GitPull issue
