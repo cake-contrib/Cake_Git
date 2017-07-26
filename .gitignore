@@ -193,3 +193,6 @@ FakesAssemblies/
 
 # Repo tests
 [Tt]est[Rr]epo/
+
+#Cake Artifacts
+[Aa]rtifacts/

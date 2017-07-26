@@ -1,4 +1,4 @@
-#addin "Cake.Git"
+#addin "nuget:?package=Cake.Git"
 using System.Security.Cryptography;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ Task("Git-HasUncommitedChanges-Dirty")
     .Does(() =>
 {
     Information("Checking if repository has uncommited changes...");
-    if (!GitHasUncommitedChanges(testInitalRepo)) 
+    if (!GitHasUncommitedChanges(testInitalRepo))
     {
         throw new Exception("Repository doesn't report uncommited changes.");
     };
@@ -182,7 +182,7 @@ Task("Git-HasUncommitedChanges-Clean")
     .Does(() =>
 {
     Information("Checking if repository has uncommited changes...");
-    if (GitHasUncommitedChanges(testInitalRepo)) 
+    if (GitHasUncommitedChanges(testInitalRepo))
     {
         throw new Exception("Repository reports uncommited changes after commiting all files.");
     };
@@ -328,12 +328,12 @@ Task("Git-Modify-Unstage")
     .Does(() =>
 {
     Information("Unstaging added test files...");
-    if (!GitHasStagedChanges(testInitalRepo)) 
+    if (!GitHasStagedChanges(testInitalRepo))
     {
         throw new Exception("Repository doesn't report indexed changes.");
     };
     GitUnstageAll(testInitalRepo);
-    if (GitHasStagedChanges(testInitalRepo)) 
+    if (GitHasStagedChanges(testInitalRepo))
     {
         throw new Exception("Repository does report indexed changes.");
     };
@@ -677,11 +677,11 @@ public static void CreateRandomDataFile(ICakeContext context, FilePath filePath)
 {
     var file = context.FileSystem.GetFile(filePath);
 
-    using (var rngCsp = new RNGCryptoServiceProvider())
+    using (var rngCsp = RandomNumberGenerator.Create())
     {
         var data = new byte[128];
         rngCsp.GetBytes(data);
-        var base64Data = Convert.ToBase64String(data, Base64FormattingOptions.InsertLineBreaks);
+        var base64Data = Convert.ToBase64String(data);
         using(var stream = file.OpenWrite())
         {
             using(var writer = new System.IO.StreamWriter(stream, Encoding.ASCII))

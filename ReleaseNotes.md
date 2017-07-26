@@ -1,3 +1,7 @@
+### New in 0.16.0 (Released 2017/07/25)
+
+* Made portable
+
 ### New in 0.15.0 (Released 2017/06/01)
 
 * Added GitHasStagedChanges alias
