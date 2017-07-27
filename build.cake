@@ -224,7 +224,7 @@ Task("Test")
         );
         DotNetCoreExecute(
             "./tools/Cake.CoreCLR/Cake.dll",
-            string.Concat("test.cake --target=", target == "Default" ? "Default-Tests" : "Local-Tests")
+            string.Concat("test.cake --verbosity=diagnostic --target=", target == "Default" ? "Default-Tests" : "Local-Tests")
             );
     };
 
