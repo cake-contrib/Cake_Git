@@ -8,6 +8,8 @@ namespace Cake.Git.Extensions
 {
     internal static class PathExtensions
     {
+        private static readonly Uri FileUri = new Uri("file://");
+
         internal static Path MakeRelativePath(this Path path, ICakeEnvironment environment, DirectoryPath rootDirectoryPath)
         {
             if (path == null)
@@ -46,13 +48,12 @@ namespace Cake.Git.Extensions
             {
                 throw new ArgumentNullException(nameof(rootDirectoryPath));
             }
-            
-            var fileUri = new Uri(filePath.MakeAbsolute(environment).FullPath);
-            var rootUri = new Uri($"{rootDirectoryPath.MakeAbsolute(environment).FullPath}/");
+
+            var fileUri = new Uri(FileUri, filePath.MakeAbsolute(environment).FullPath);
+            var rootUri = new Uri(FileUri, $"{rootDirectoryPath.MakeAbsolute(environment).FullPath}/");
 
             var relativeUri = rootUri.MakeRelativeUri(fileUri);
             var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
             var relativeFilePath = new FilePath(relativePath);
 
             return relativeFilePath;
@@ -75,12 +76,11 @@ namespace Cake.Git.Extensions
                 throw new ArgumentNullException(nameof(rootDirectoryPath));
             }
 
-            var dirUri = new Uri(directoryPath.MakeAbsolute(environment).FullPath);
-            var rootUri = new Uri($"{rootDirectoryPath.MakeAbsolute(environment).FullPath}/");
+            var dirUri = new Uri(FileUri, directoryPath.MakeAbsolute(environment).FullPath);
+            var rootUri = new Uri(FileUri, $"{rootDirectoryPath.MakeAbsolute(environment).FullPath}/");
 
             var relativeUri = rootUri.MakeRelativeUri(dirUri);
             var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
             var relativeDirectoryPath = new DirectoryPath(relativePath);
 
             return relativeDirectoryPath;
