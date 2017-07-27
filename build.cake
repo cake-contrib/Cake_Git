@@ -122,7 +122,7 @@ Task("Restore")
         Information("Restoring {0}...", solution);
         DotNetCoreRestore(solution.FullPath, new DotNetCoreRestoreSettings {
                 Verbosity = DotNetCoreVerbosity.Minimal,
-                Sources = new [] { "https://api.nuget.org/v3/index.json" },
+                Sources = new [] { "https://api.nuget.org/v3/index.json", "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json" },
                 MSBuildSettings = msBuildSettings
         });
     }
