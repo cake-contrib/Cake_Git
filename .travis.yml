@@ -1,10 +1,27 @@
 language: csharp
-script:
-  - ./build.sh
 os:
-  - linux
   - osx
-cache:
-  directories:
-    - src/packages
-    - tools
+  - linux
+
+# .NET CLI require Ubuntu 14.04
+sudo: required
+dist: trusty
+addons:
+  apt:
+    packages:
+    - gettext
+    - libcurl4-openssl-dev
+    - libicu-dev
+    - libssl-dev
+    - libunwind8
+
+# .NET CLI require OSX 10.10
+osx_image: xcode8.3
+
+mono:
+  - 4.4.2
+
+dotnet: 1.0.4
+
+script:
+  - ./build.sh --verbosity diagnostic
