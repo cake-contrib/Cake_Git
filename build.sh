@@ -63,7 +63,7 @@ fi
 
 # Restore tools from NuGet.
 pushd $TOOLS_DIR >/dev/null
-mono $NUGET_EXE install -ExcludeVersion
+mono $NUGET_EXE install -ExcludeVersion -Source "https://www.myget.org/F/devlead/api/v3/index.json"
 if [ $? -ne 0 ]; then
     echo "Could not restore NuGet packages."
     exit 1
