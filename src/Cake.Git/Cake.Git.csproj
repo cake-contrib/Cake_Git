@@ -4,7 +4,8 @@
     <Copyright>WCOM AB</Copyright>
     <Authors>WCOMAB and contributors</Authors>
     <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
-    <PlatformTarget>AnyCpu</PlatformTarget>
+    <PlatformTarget Condition=" '$(TargetFramework)' == 'net45' ">x64</PlatformTarget>
+    <PlatformTarget Condition=" '$(TargetFramework)' != 'net45' ">AnyCpu</PlatformTarget>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Cake.Git</AssemblyName>
     <PackageId>Cake.Git</PackageId>

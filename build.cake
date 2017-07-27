@@ -182,14 +182,20 @@ Task("Create-NuGet-Package")
     .IsDependentOn("Publish-Artifacts")
     .Does(() =>
 {
-    var native = GetFiles(artifactsRoot.FullPath + "/**/lib/**/*");
+    var native = GetFiles(artifactsRoot.FullPath + "/net45/lib/**/*");
     var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
     var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
+    var coreNative = GetFiles(artifactsRoot.FullPath + "/netstandard1.6/lib/**/*") - GetFiles(artifactsRoot.FullPath + "/netstandard1.6/lib/**/x86/*");
 
     nuGetPackSettings.Files =  (native + libGit + cakeGit)
                                     .Where(file=>!file.FullPath.Contains("Cake.Core.") && !file.FullPath.Contains("/runtimes/"))
                                     .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
                                     .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
+                                    .Union(
+                                        coreNative
+                                            .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
+                                            .Select(file=>new NuSpecContent {Source = file, Target = "lib/netstandard1.6/" + new FilePath(file).GetFilename().FullPath})
+                                        )
                                     .ToArray();
 
     if (!DirectoryExists(nugetRoot))
