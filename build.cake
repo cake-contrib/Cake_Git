@@ -83,6 +83,15 @@ Setup(ctx =>
                             );
 
     Information(buildStartMessage);
+
+    if(!IsRunningOnWindows())
+    {
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
+
+        // Use FrameworkPathOverride when not running on Windows.
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
+    }
 });
 
 Teardown(ctx =>
@@ -122,7 +131,7 @@ Task("Restore")
         Information("Restoring {0}...", solution);
         DotNetCoreRestore(solution.FullPath, new DotNetCoreRestoreSettings {
                 Verbosity = DotNetCoreVerbosity.Minimal,
-                Sources = new [] { "https://api.nuget.org/v3/index.json", "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json" },
+                Sources = new [] { "https://www.myget.org/F/cake/api/v3/index.json","https://api.nuget.org/v3/index.json", "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json" },
                 MSBuildSettings = msBuildSettings
         });
     }
@@ -165,9 +174,9 @@ Task("Publish-Artifacts")
 
     DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
     {
-        Framework = "net45",
+        Framework = "net46",
         MSBuildSettings = msBuildSettings,
-        OutputDirectory = artifactsRoot + "/net45"
+        OutputDirectory = artifactsRoot + "/net46"
     });
 
     DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
@@ -182,7 +191,7 @@ Task("Create-NuGet-Package")
     .IsDependentOn("Publish-Artifacts")
     .Does(() =>
 {
-    var native = GetFiles(artifactsRoot.FullPath + "/net45/lib/**/*");
+    var native = GetFiles(artifactsRoot.FullPath + "/net46/lib/**/*");
     var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
     var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
     var coreNative = GetFiles(artifactsRoot.FullPath + "/netstandard1.6/lib/**/*") - GetFiles(artifactsRoot.FullPath + "/netstandard1.6/lib/**/x86/*");
@@ -211,7 +220,7 @@ Task("Test")
     .Does(() =>
 {
     var package = nugetRoot + "Cake.Git." + semVersion + ".nupkg";
-    var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git"));
+    var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git/Cake.Git"));
     if (DirectoryExists(addinDir))
     {
         DeleteDirectory(addinDir, true);
@@ -224,7 +233,7 @@ Task("Test")
         );
         DotNetCoreExecute(
             "./tools/Cake.CoreCLR/Cake.dll",
-            string.Concat("test.cake --verbosity=diagnostic --target=", target == "Default" ? "Default-Tests" : "Local-Tests")
+            string.Concat("test.cake --target=", target == "Default" ? "Default-Tests" : "Local-Tests")
             );
     };
 

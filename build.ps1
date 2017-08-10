@@ -78,12 +78,12 @@ Set-Location $TOOLS_DIR
 # Restore packages
 if (Test-Path $PACKAGES_CONFIG)
 {
-    Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -Source `"https://www.myget.org/F/devlead/api/v3/index.json`""
+    Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -Source `"https://www.myget.org/F/cake/api/v3/index.json`""
 }
 # Install just Cake if missing config
 else
 {
-    Invoke-Expression "&`"$NUGET_EXE`" install Cake -ExcludeVersion -Source `"https://www.myget.org/F/devlead/api/v3/index.json`""
+    Invoke-Expression "&`"$NUGET_EXE`" install Cake -ExcludeVersion -Source `"https://www.myget.org/F/cake/api/v3/index.json`""
 }
 Pop-Location
 if ($LASTEXITCODE -ne 0)

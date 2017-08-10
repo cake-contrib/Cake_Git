@@ -3,9 +3,9 @@
     <Description>The Cake core library.</Description>
     <Copyright>WCOM AB</Copyright>
     <Authors>WCOMAB and contributors</Authors>
-    <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
-    <PlatformTarget Condition=" '$(TargetFramework)' == 'net45' ">x64</PlatformTarget>
-    <PlatformTarget Condition=" '$(TargetFramework)' != 'net45' ">AnyCpu</PlatformTarget>
+    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
+    <PlatformTarget Condition=" '$(TargetFramework)' == 'net46' ">x64</PlatformTarget>
+    <PlatformTarget Condition=" '$(TargetFramework)' != 'net46' ">AnyCpu</PlatformTarget>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Cake.Git</AssemblyName>
     <PackageId>Cake.Git</PackageId>
@@ -34,19 +34,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.17.0">
+    <PackageReference Include="Cake.Core" Version="0.22.0-alpha0075">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="LibGit2Sharp" Version="0.25.0-preview-0033" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.185" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;ubuntu.16.10-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;fedora.24-x64;opensuse.13.2-x64;opensuse.42.1-x64</RuntimeIdentifiers>
-    <FrameworkPathOverride>$(NuGetPackageFolders)microsoft.targetingpack.netframework.v4.5\1.0.1\lib\net45\</FrameworkPathOverride>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.5" Version="1.0.1" ExcludeAssets="All" PrivateAssets="All" />
-  </ItemGroup>
 </Project>
