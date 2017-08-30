@@ -427,6 +427,18 @@ Task("Git-Tag-Apply")
     GitTag(testInitalRepo, "test-tag");
 });
 
+Task("Git-AllTags")
+    .IsDependentOn("Git-Tag")
+    .Does(()=>
+    {
+        var tags = GitTags(testInitalRepo);
+        if(tags.Count(t=>t.FriendlyName == "test-tag") < 1)
+            throw new Exception("test-tag not found");
+        if(tags.Count(t=>t.FriendlyName == "test-tag-objectish") < 1)
+            throw new Exception("test-tag not found");
+    }
+    );
+
 Task("Git-Describe-Generic")
     .IsDependentOn("Git-Tag")
     .Does(() =>
@@ -625,7 +637,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Current-Branch")
     .IsDependentOn("Git-Remote-Branch")
-    .IsDependentOn("Git-Checkout");
+    .IsDependentOn("Git-Checkout")
+    .IsDependentOn("Git-AllTags");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -653,7 +666,8 @@ Task("Local-Tests")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Current-Branch")
     .IsDependentOn("Git-Remote-Branch")
-    .IsDependentOn("Git-Checkout");
+    .IsDependentOn("Git-Checkout")
+    .IsDependentOn("Git-AllTags");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
