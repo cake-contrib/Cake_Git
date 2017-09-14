@@ -177,7 +177,7 @@ Task("Test")
     .Does(() =>
 {
     var package = nugetRoot + "Cake.Git." + semVersion + ".nupkg";
-    var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git"));
+    var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git/Cake.Git"));
     if (DirectoryExists(addinDir))
     {
         DeleteDirectory(addinDir, true);
