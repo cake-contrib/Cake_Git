@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GitAliases.Tags.cs" />
     <Compile Include="GitAliases.Unstage.cs" />
     <Compile Include="GitAliases.Repository.cs" />
     <Compile Include="GitAliases.Reset.cs" />
