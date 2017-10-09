@@ -1,3 +1,9 @@
+### New in 0.16.1 (Released 2017/10/09)
+
+* Updated nuget icon and repo url
+* Add framework lib/net46 moniker
+* Fix warnings in build script
+
 ### New in 0.16.0 (Released 2017/09/14)
 
 * Bumped Cake.Core to 0.22.0

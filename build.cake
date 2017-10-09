@@ -159,9 +159,9 @@ Task("Create-NuGet-Package")
     .Does(() =>
 {
     nuGetPackSettings.Files = GetFiles(binDir + "/**/*")
-                                .Where(file=>!file.FullPath.Contains("Cake.Core."))
-                                .Select(file=>file.FullPath.Substring(binDir.FullPath.Length+1))
-                                .Select(file=>new NuSpecContent {Source = file, Target = file})
+                                .Where(file => !file.FullPath.Contains("Cake.Core."))
+                                .Select(file => file.FullPath.Substring(binDir.FullPath.Length+1))
+                                .Select(file => new NuSpecContent { Source = file, Target = "lib/net46/" + file })
                                 .ToArray();
 
     if (!DirectoryExists(nugetRoot))
@@ -180,7 +180,10 @@ Task("Test")
     var addinDir = MakeAbsolute(Directory("./tools/Addins/Cake.Git/Cake.Git"));
     if (DirectoryExists(addinDir))
     {
-        DeleteDirectory(addinDir, true);
+        DeleteDirectory(addinDir, new DeleteDirectorySettings {
+            Recursive = true,
+            Force = true
+        });
     }
     Unzip(package, addinDir);
 
