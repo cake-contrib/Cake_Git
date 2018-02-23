@@ -42,9 +42,9 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
 
-            if (tagName == null)
+            if (String.IsNullOrWhiteSpace(tagName))
             {
-                throw new ArgumentNullException(nameof(tagName));
+                throw new ArgumentException(nameof(tagName));
             }
 
             context.UseRepository(
@@ -85,14 +85,14 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
 
-            if (tagName == null)
+            if (String.IsNullOrWhiteSpace(tagName))
             {
-                throw new ArgumentNullException(nameof(tagName));
+                throw new ArgumentException(nameof(tagName));
             }
 
-            if (objectish == null)
+            if (String.IsNullOrWhiteSpace(objectish))
             {
-                throw new ArgumentNullException(nameof(objectish));
+                throw new ArgumentException(nameof(objectish));
             }
 
             context.UseRepository(
@@ -136,24 +136,24 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
 
-            if (tagName == null)
+            if (String.IsNullOrWhiteSpace(tagName))
             {
-                throw new ArgumentNullException(nameof(tagName));
+                throw new ArgumentException(nameof(tagName));
             }
 
-            if (name == null)
+            if (String.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentException(nameof(name));
             }
 
-            if (email == null)
+            if (String.IsNullOrWhiteSpace(email))
             {
-                throw new ArgumentNullException(nameof(email));
+                throw new ArgumentException(nameof(email));
             }
 
-            if (string.IsNullOrEmpty(message))
+            if (string.IsNullOrWhiteSpace(message))
             {
-                throw new ArgumentNullException(nameof(message));
+                throw new ArgumentException(nameof(message));
             }
 
             context.UseRepository(
@@ -199,14 +199,24 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
 
-            if (tagName == null)
+            if (String.IsNullOrWhiteSpace(tagName))
             {
-                throw new ArgumentNullException(nameof(tagName));
+                throw new ArgumentException(nameof(tagName));
             }
 
-            if (objectish == null)
+            if (String.IsNullOrWhiteSpace(objectish))
             {
-                throw new ArgumentNullException(nameof(objectish));
+                throw new ArgumentException(nameof(objectish));
+            }
+
+            if (String.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException(nameof(name));
+            }
+
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException(nameof(email));
             }
 
             context.UseRepository(
