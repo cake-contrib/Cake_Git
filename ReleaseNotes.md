@@ -1,3 +1,7 @@
+### New in 0.17.0 (Released 2018/03/01)
+
+* Bumped Cake.Core to 0.26.0
+
 ### New in 0.16.1 (Released 2017/10/09)
 
 * Updated nuget icon and repo url
