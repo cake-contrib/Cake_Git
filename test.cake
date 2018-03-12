@@ -644,6 +644,16 @@ Task("Git-Current-Branch")
     Information("Current branch: {0}", branch);
 });
 
+Task("Git-Create-Branch")
+.Does(() => 
+{
+    var branchName = "Foo";
+    GitCreateBranch(testInitalRepo, branchName, true);
+    var branch = GitBranchCurrent(testInitalRepo);
+    if (branch.FriendlyName != branchName)
+     throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
+});
+
 Task("Git-Remote-Branch")
     .Does(() =>
 {
@@ -763,6 +773,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Create-Branch")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
@@ -794,6 +805,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Create-Branch")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
