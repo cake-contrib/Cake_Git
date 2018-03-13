@@ -1,4 +1,4 @@
-#addin "Cake.Git"
+#r "./tools/Addins/Cake.Git/Cake.Git/lib/net46/Cake.Git.dll"
 using System.Security.Cryptography;
 
 ///////////////////////////////////////////////////////////////////////////////
