@@ -69,7 +69,7 @@ namespace Cake.Git
         }
 
         /// <summary>
-        /// Clone unauthenticated using default options.
+        /// Clone unauthenticated using specific settings.
         /// </summary>
         /// <example>
         /// <code>
@@ -202,7 +202,7 @@ namespace Cake.Git
         }
 
         /// <summary>
-        /// Clone authenticated using default options.
+        /// Clone authenticated using specific settings.
         /// </summary>
         /// <example>
         /// <code>
