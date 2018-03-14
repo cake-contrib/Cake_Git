@@ -151,6 +151,28 @@ Task("Create-Test-Files")
                     .ToArray();
 });
 
+Task("Create-Untracked-Test-Files")
+    .Does(() =>
+{
+    Information("Creating untracked test files...");
+    Enumerable
+        .Range(1, 10)
+        .Select(
+            index=> {
+                FilePath filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.{1:000}",
+                    Guid.NewGuid(),
+                    index
+                    ));
+                Information("Creating file {0}...", filePath);
+                CreateRandomDataFile(Context, filePath);
+                Information("File {0} created.", filePath);
+
+                return filePath;
+            }
+            )
+        .ToArray();
+});
+
 Task("Git-Init-Add")
     .IsDependentOn("Create-Test-Files")
     .Does(() =>
@@ -698,6 +720,22 @@ Task("Git-Reset-Hard")
     GitReset(testInitalRepo, GitResetMode.Hard);
 });
 
+Task("Git-Clean")
+  .IsDependentOn("Create-Untracked-Test-Files")
+  .Does(() =>
+{
+    Information("Performing hard reset on files...");
+    
+    if (!GitHasUntrackedFiles(testInitalRepo))
+        throw new InvalidOperationException("Repo contains no untracked files");
+
+    GitClean(testInitalRepo);
+
+    if (GitHasUntrackedFiles(testInitalRepo))
+        throw new InvalidOperationException("Git clean is not working properly");
+});
+
+
 
 
 Task("Git-Tag")
@@ -777,7 +815,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
-    .IsDependentOn("Git-AllTags-Annotated");
+    .IsDependentOn("Git-AllTags-Annotated")
+    .IsDependentOn("Git-Clean");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -809,7 +848,8 @@ Task("Local-Tests")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
-    .IsDependentOn("Git-AllTags-Annotated");
+    .IsDependentOn("Git-AllTags-Annotated")
+    .IsDependentOn("Git-Clean");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
