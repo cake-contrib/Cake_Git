@@ -1,4 +1,4 @@
-#addin "Cake.Git"
+#r "./tools/Addins/Cake.Git/Cake.Git/lib/net46/Cake.Git.dll"
 using System.Security.Cryptography;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,6 +19,8 @@ var version                 = releaseNotes.Version.ToString();
 var semVersion              = isLocalBuild
                                 ? version
                                 : string.Concat(version, "-build-", AppVeyor.Environment.Build.Number.ToString("0000"));
+var testUser                = "John Doe";
+var testUserEmail           = "john@doe.com";
 FilePath[]  testFiles       = null,
             testDeleteFiles = null,
             testModifyFiles = null;
@@ -149,6 +151,28 @@ Task("Create-Test-Files")
                     .ToArray();
 });
 
+Task("Create-Untracked-Test-Files")
+    .Does(() =>
+{
+    Information("Creating untracked test files...");
+    Enumerable
+        .Range(1, 10)
+        .Select(
+            index=> {
+                FilePath filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.{1:000}",
+                    Guid.NewGuid(),
+                    index
+                    ));
+                Information("Creating file {0}...", filePath);
+                CreateRandomDataFile(Context, filePath);
+                Information("File {0} created.", filePath);
+
+                return filePath;
+            }
+            )
+        .ToArray();
+});
+
 Task("Git-Init-Add")
     .IsDependentOn("Create-Test-Files")
     .Does(() =>
@@ -162,7 +186,7 @@ Task("Git-Init-Commit")
     .Does(() =>
 {
     Information("Committing files...");
-    initalCommit = GitCommit(testInitalRepo, "John Doe", "john@doe.com", "Inital commit");
+    initalCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Inital commit");
     Information("Commit created:\r\n{0}", initalCommit);
 });
 
@@ -262,7 +286,7 @@ Task("Git-Remove-Commit")
     .Does(() =>
 {
     Information("Committing removed files...");
-    removeCommit = GitCommit(testInitalRepo, "John Doe", "john@doe.com", "Remove commit");
+    removeCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Remove commit");
     Information("Commit created:\r\n{0}", removeCommit);
 });
 
@@ -345,7 +369,7 @@ Task("Git-Modify-Commit")
     .Does(() =>
 {
     Information("Committing modified files...");
-    modifiedCommit = GitCommit(testInitalRepo, "John Doe", "john@doe.com", "Modified commit");
+    modifiedCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Modified commit");
     Information("Commit created:\r\n{0}", modifiedCommit);
 });
 
@@ -420,6 +444,13 @@ Task("Git-Tag-Apply-Objectish")
     GitTag(testInitalRepo, "test-tag-objectish", modifiedCommit.Sha);
 });
 
+Task("Git-Annotated-Tag-Apply-Objectish")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    GitTag(testInitalRepo, "test-annotated-tag-objectish", modifiedCommit.Sha, testUser, testUserEmail, "Test annotated tag. (objectish)");
+});
+
 Task("Git-Tag-Apply")
     .IsDependentOn("Git-Tag-Apply-Objectish")
     .Does(() =>
@@ -427,8 +458,15 @@ Task("Git-Tag-Apply")
     GitTag(testInitalRepo, "test-tag");
 });
 
+Task("Git-Annotated-Tag-Apply")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    GitTag(testInitalRepo, "test-annotated-tag", testUser, testUserEmail, "Test annotated tag.");
+});
+
 Task("Git-AllTags")
-    .IsDependentOn("Git-Tag")
+    .IsDependentOn("Git-Tag")    
     .Does(()=>
     {
         var tags = GitTags(testInitalRepo);
@@ -436,6 +474,18 @@ Task("Git-AllTags")
             throw new Exception("test-tag not found");
         if(tags.Count(t=>t.FriendlyName == "test-tag-objectish") < 1)
             throw new Exception("test-tag not found");
+    }
+    );
+
+Task("Git-AllTags-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")    
+    .Does(()=>
+    {
+        var tags = GitTags(testInitalRepo);
+        if(tags.Count(t=>t.FriendlyName == "test-annotated-tag") < 1)
+            throw new Exception("test-annotated-tag not found");
+        if(tags.Count(t=>t.FriendlyName == "test-annotated-tag-objectish") < 1)
+            throw new Exception("test-annotated-tag-objectish not found");
     }
     );
 
@@ -524,11 +574,106 @@ Task("Git-Describe-Master")
         throw new Exception("Wrong describe");
 });
 
+Task("Git-Describe-Generic-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tag = GitDescribe(testInitalRepo);
+    Information("Describe returned: [{0}]", tag);
+    if (!tag.Contains("test-annotated-tag"))
+        throw new Exception("Wrong described tag: " + tag);
+});
+
+Task("Git-Describe-Tags-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tag = GitDescribe(testInitalRepo, GitDescribeStrategy.Tags);
+    Information("Describe returned: [{0}]", tag);
+    if (!tag.Contains("test-annotated-tag"))
+        throw new Exception("Wrong described tag: " + tag);
+});
+
+Task("Git-Describe-Long-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!tagNotAlwaysLong.Equals("test-annotated-tag"))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Abbrev-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!tagNotAlwaysLong.Equals("test-annotated-tag"))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Commit-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!tagNotAlwaysLong.Equals("test-annotated-tag"))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Commit-NoTag-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!string.IsNullOrEmpty(tagAlwaysLong))
+        throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
+    if (!string.IsNullOrEmpty(tagNotAlwaysLong))
+        throw new Exception("Wrong described tagNotAlwaysLong: " + tagNotAlwaysLong);
+});
+
+Task("Git-Describe-Master-Annotated")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tagAlwaysLong = GitDescribe(testInitalRepo, "master", true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitalRepo, "master", false, GitDescribeStrategy.Tags, 16);
+    Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
+    if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
+        throw new Exception("Wrong describe");
+    if (!tagNotAlwaysLong.Equals("test-annotated-tag"))
+        throw new Exception("Wrong describe");
+});
+
 Task("Git-Current-Branch")
     .Does(() =>
 {
     var branch = GitBranchCurrent(testInitalRepo);
     Information("Current branch: {0}", branch);
+});
+
+Task("Git-Create-Branch")
+.Does(() => 
+{
+    var branchName = "Foo";
+    GitCreateBranch(testInitalRepo, branchName, true);
+    var branch = GitBranchCurrent(testInitalRepo);
+    if (branch.FriendlyName != branchName)
+     throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
 });
 
 Task("Git-Remote-Branch")
@@ -575,11 +720,31 @@ Task("Git-Reset-Hard")
     GitReset(testInitalRepo, GitResetMode.Hard);
 });
 
+Task("Git-Clean")
+  .IsDependentOn("Create-Untracked-Test-Files")
+  .Does(() =>
+{
+    Information("Performing hard reset on files...");
+    
+    if (!GitHasUntrackedFiles(testInitalRepo))
+        throw new InvalidOperationException("Repo contains no untracked files");
+
+    GitClean(testInitalRepo);
+
+    if (GitHasUntrackedFiles(testInitalRepo))
+        throw new InvalidOperationException("Git clean is not working properly");
+});
+
+
 
 
 Task("Git-Tag")
     .IsDependentOn("Git-Tag-Apply")
     .IsDependentOn("Git-Tag-Apply-Objectish");
+
+Task("Git-Tag-Annotated")
+    .IsDependentOn("Git-Annotated-Tag-Apply")
+    .IsDependentOn("Git-Annotated-Tag-Apply-Objectish");
 
 Task("Git-Describe")
     .IsDependentOn("Git-Describe-Generic")
@@ -589,6 +754,15 @@ Task("Git-Describe")
     .IsDependentOn("Git-Describe-Commit")
     .IsDependentOn("Git-Describe-Commit-NoTag")
     .IsDependentOn("Git-Describe-Master");
+
+Task("Git-Describe-Annotated")
+    .IsDependentOn("Git-Describe-Generic-Annotated")
+    .IsDependentOn("Git-Describe-Tags-Annotated")
+    .IsDependentOn("Git-Describe-Long-Annotated")
+    .IsDependentOn("Git-Describe-Abbrev-Annotated")
+    .IsDependentOn("Git-Describe-Commit-Annotated")
+    .IsDependentOn("Git-Describe-Commit-NoTag-Annotated")
+    .IsDependentOn("Git-Describe-Master-Annotated");
 
 Task("Git-Log")
     .IsDependentOn("Git-Log-TipToCommitId")
@@ -635,10 +809,14 @@ Task("Default-Tests")
     .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
+    .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Create-Branch")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
-    .IsDependentOn("Git-AllTags");
+    .IsDependentOn("Git-AllTags")
+    .IsDependentOn("Git-AllTags-Annotated")
+    .IsDependentOn("Git-Clean");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -664,10 +842,14 @@ Task("Local-Tests")
     .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
+    .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
+    .IsDependentOn("Git-Create-Branch")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
-    .IsDependentOn("Git-AllTags");
+    .IsDependentOn("Git-AllTags")
+    .IsDependentOn("Git-AllTags-Annotated")
+    .IsDependentOn("Git-Clean");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
