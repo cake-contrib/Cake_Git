@@ -1,3 +1,8 @@
+### New in 0.18.0 (Released 2018/07/04)
+
+* Bumped Cake.Core to 0.28.1
+* Add git clean command
+
 ### New in 0.17.0 (Released 2018/03/01)
 
 * Bumped Cake.Core to 0.26.0
