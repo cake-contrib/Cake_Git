@@ -121,6 +121,42 @@ namespace Cake.Git
         }
 
         /// <summary>
+        /// Checks if a repository contains untracked files.
+        /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitHasStagedChanges("c:/temp/cake");
+        /// </code>
+        /// </example>
+        /// <param name="context">The context.</param>
+        /// <param name="path">Path to the repository to check.</param>
+        /// <returns>True if the Git repository contains staged changes.</returns>
+        /// <exception cref="ArgumentNullException">If any of the parameters are null.</exception>
+        /// <exception cref="RepositoryNotFoundException">If path doesn't exist.</exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Repository")]
+        public static bool GitHasUntrackedFiles(this ICakeContext context, DirectoryPath path)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (!context.FileSystem.Exist(path))
+            {
+                throw new RepositoryNotFoundException($"Path '{path}' doesn't exists.");
+            }
+            return context.UseRepository(
+                path,
+                repository => repository.RetrieveStatus().Untracked.Any());
+        }
+
+        /// <summary>
         /// Finding git root path from subtree.
         /// </summary>
         /// <example>
