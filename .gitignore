@@ -195,3 +195,6 @@ FakesAssemblies/
 # Repo tests
 [Tt]est[Rr]epo/
 *.ide
+
+#Cake Artifacts dir
+[Aa]rtifacts/

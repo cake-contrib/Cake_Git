@@ -14,8 +14,9 @@ var solutions           = GetFiles("./**/*.sln");
 var solutionPaths       = solutions.Select(solution => solution.GetDirectory());
 var releaseNotes        = ParseReleaseNotes("./ReleaseNotes.md");
 var version             = releaseNotes.Version.ToString();
-var binDir              = MakeAbsolute(Directory("./src/Cake.Git/bin/" + configuration));
+var binDir              = MakeAbsolute(Directory("./src/Cake.Git/bin/" + configuration + "/net461"));
 var nugetRoot           = "./nuget/";
+var artifactsRoot       = MakeAbsolute(Directory("./artifacts/"));
 var semVersion          = isLocalBuild
                                 ? version
                                 : string.Concat(version, "-build-", AppVeyor.Environment.Build.Number.ToString("0000"));
@@ -49,9 +50,15 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 Symbols                 = false,
                                 NoPackageAnalysis       = true,
                                 Files                   = new NuSpecContent[0], // is set dynamically
-                                BasePath                = binDir,
+                                BasePath                = artifactsRoot,
                                 OutputDirectory         = nugetRoot
                             };
+
+var msBuildSettings     = new DotNetCoreMSBuildSettings()
+                            .WithProperty("Version", semVersion)
+                            .WithProperty("AssemblyVersion", version)
+                            .WithProperty("FileVersion", version)
+                            .WithProperty("PackageReleaseNotes", string.Concat("\"", string.Concat(releaseNotes.Notes.ToArray()), "\""));
 
 Context.Tools.RegisterFile("./tools/nuget.exe");
 
@@ -77,6 +84,15 @@ Setup(ctx =>
                             );
 
     Information(buildStartMessage);
+
+    if(!IsRunningOnWindows())
+    {
+        var frameworkPathOverride = new FilePath(typeof(object).Assembly.Location).GetDirectory().FullPath + "/";
+
+        // Use FrameworkPathOverride when not running on Windows.
+        Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
+        msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
+    }
 });
 
 Teardown(ctx =>
@@ -102,6 +118,9 @@ Task("Clean")
 
     Information("Cleaning {0}", nugetRoot);
     CleanDirectory(MakeAbsolute(Directory(nugetRoot)));
+
+    Information("Cleaning {0}", artifactsRoot);
+    CleanDirectory(artifactsRoot);
 });
 
 Task("Restore")
@@ -111,7 +130,12 @@ Task("Restore")
     foreach(var solution in solutions)
     {
         Information("Restoring {0}...", solution);
-        NuGetRestore(solution);
+        DotNetCoreRestore(
+            solution.FullPath,
+            new DotNetCoreRestoreSettings {
+                Verbosity = DotNetCoreVerbosity.Minimal,
+                MSBuildSettings = msBuildSettings
+        });
     }
 });
 
@@ -134,35 +158,64 @@ Task("Build")
     foreach(var solution in solutions)
     {
         Information("Building {0}", solution);
-        if (IsRunningOnUnix())
-        {
-             XBuild(solution, new XBuildSettings()
-                .SetConfiguration(configuration)
-                .WithProperty("POSIX", "True")
-                .WithProperty("TreatWarningsAsErrors", "True")
-                .SetVerbosity(Verbosity.Minimal)
-            );
-        }
-        else
-        {
-            MSBuild(solution, settings =>
-                settings.SetPlatformTarget(PlatformTarget.MSIL)
-                    .WithProperty("TreatWarningsAsErrors","true")
-                    .WithTarget("Build")
-                    .SetConfiguration(configuration));
-        }
+        DotNetCoreBuild(
+            solution.FullPath,
+            new DotNetCoreBuildSettings {
+                   Configuration = configuration,
+                    NoRestore = true,
+                    MSBuildSettings = msBuildSettings
+                });
     }
 });
 
-Task("Create-NuGet-Package")
+Task("Publish-Artifacts")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    nuGetPackSettings.Files = GetFiles(binDir + "/**/*")
-                                .Where(file => !file.FullPath.Contains("Cake.Core."))
-                                .Select(file => file.FullPath.Substring(binDir.FullPath.Length+1))
-                                .Select(file => new NuSpecContent { Source = file, Target = "lib/net46/" + file })
-                                .ToArray();
+    if (!DirectoryExists(artifactsRoot))
+    {
+        CreateDirectory(artifactsRoot);
+    }
+
+    DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
+    {
+        NoRestore = true,
+        Framework = "net461",
+        MSBuildSettings = msBuildSettings,
+        OutputDirectory = artifactsRoot + "/net461"
+    });
+
+    DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
+    {
+        NoRestore = true,
+        Framework = "netstandard2.0",
+        MSBuildSettings = msBuildSettings,
+        OutputDirectory = artifactsRoot + "/netstandard2.0"
+    });
+});
+
+
+Task("Create-NuGet-Package")
+    .IsDependentOn("Publish-Artifacts")
+    .Does(() =>
+{
+    var native = GetFiles(artifactsRoot.FullPath + "/net461/lib/**/*");
+    var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
+    var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
+    var coreNative = GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/**/*")
+                        - GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/win7-x86/**/*");
+    nuGetPackSettings.Files =  (native + libGit + cakeGit)
+                                    .Where(file=>!file.FullPath.Contains("Cake.Core.") && !file.FullPath.Contains("/runtimes/"))
+                                    .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
+                                    .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
+                                    .Union(
+                                        coreNative
+                                            .Select(file=>new NuSpecContent {
+                                                Source = file.FullPath.Substring(artifactsRoot.FullPath.Length+1),
+                                                Target = "lib/netstandard2.0/" + file.GetFilename()
+                                                })
+                                        )
+                                    .ToArray();
 
     if (!DirectoryExists(nugetRoot))
     {
@@ -187,7 +240,18 @@ Task("Test")
     }
     Unzip(package, addinDir);
 
-    Action executeTests = ()=> CakeExecuteScript("./test.cake", new CakeSettings{ Arguments = new Dictionary<string, string>{{"target", target == "Default" ? "Default-Tests" : "Local-Tests"}}});
+    Action executeTests = ()=> {
+        CakeExecuteScript("./testnet461.cake",
+            new CakeSettings{
+                Arguments = new Dictionary<string, string>{
+                    {"target", target == "Default" ? "Default-Tests" : "Local-Tests"}}});
+
+          DotNetCoreExecute(
+            "./tools/Cake.CoreCLR/Cake.dll",
+            string.Concat("testnetstandard2.cake --target=", target == "Default" ? "Default-Tests" : "Local-Tests")
+            );
+    };
+
     if (TravisCI.IsRunningOnTravisCI)
     {
         using(TravisCI.Fold("Execute-Tests"))

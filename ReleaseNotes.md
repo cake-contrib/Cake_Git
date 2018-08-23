@@ -1,3 +1,8 @@
+### New in 0.19.0 (Released 2018/08/23)
+
+* Ported to .NET Standard 2.0
+* Updated to LibGit2Sharp 0.25.2
+
 ### New in 0.18.0 (Released 2018/07/04)
 
 * Bumped Cake.Core to 0.28.1

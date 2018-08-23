@@ -1,4 +1,3 @@
-#r "./tools/Addins/Cake.Git/Cake.Git/lib/net46/Cake.Git.dll"
 using System.Security.Cryptography;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -195,7 +194,7 @@ Task("Git-HasUncommitedChanges-Dirty")
     .Does(() =>
 {
     Information("Checking if repository has uncommited changes...");
-    if (!GitHasUncommitedChanges(testInitalRepo)) 
+    if (!GitHasUncommitedChanges(testInitalRepo))
     {
         throw new Exception("Repository doesn't report uncommited changes.");
     };
@@ -206,7 +205,7 @@ Task("Git-HasUncommitedChanges-Clean")
     .Does(() =>
 {
     Information("Checking if repository has uncommited changes...");
-    if (GitHasUncommitedChanges(testInitalRepo)) 
+    if (GitHasUncommitedChanges(testInitalRepo))
     {
         throw new Exception("Repository reports uncommited changes after commiting all files.");
     };
@@ -352,12 +351,12 @@ Task("Git-Modify-Unstage")
     .Does(() =>
 {
     Information("Unstaging added test files...");
-    if (!GitHasStagedChanges(testInitalRepo)) 
+    if (!GitHasStagedChanges(testInitalRepo))
     {
         throw new Exception("Repository doesn't report indexed changes.");
     };
     GitUnstageAll(testInitalRepo);
-    if (GitHasStagedChanges(testInitalRepo)) 
+    if (GitHasStagedChanges(testInitalRepo))
     {
         throw new Exception("Repository does report indexed changes.");
     };
@@ -466,7 +465,7 @@ Task("Git-Annotated-Tag-Apply")
 });
 
 Task("Git-AllTags")
-    .IsDependentOn("Git-Tag")    
+    .IsDependentOn("Git-Tag")
     .Does(()=>
     {
         var tags = GitTags(testInitalRepo);
@@ -478,7 +477,7 @@ Task("Git-AllTags")
     );
 
 Task("Git-AllTags-Annotated")
-    .IsDependentOn("Git-Tag-Annotated")    
+    .IsDependentOn("Git-Tag-Annotated")
     .Does(()=>
     {
         var tags = GitTags(testInitalRepo);
@@ -667,7 +666,7 @@ Task("Git-Current-Branch")
 });
 
 Task("Git-Create-Branch")
-.Does(() => 
+.Does(() =>
 {
     var branchName = "Foo";
     GitCreateBranch(testInitalRepo, branchName, true);
@@ -725,7 +724,7 @@ Task("Git-Clean")
   .Does(() =>
 {
     Information("Performing hard reset on files...");
-    
+
     if (!GitHasUntrackedFiles(testInitalRepo))
         throw new InvalidOperationException("Repo contains no untracked files");
 
