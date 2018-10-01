@@ -2,7 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/Cake.Git.svg)](https://www.nuget.org/packages/Cake.Git) [![MyGet](https://img.shields.io/myget/cake-contrib/vpre/Cake.Git.svg?label=MyGet)](https://www.myget.org/feed/wcomab/package/nuget/Cake.Git)
 
-Cake AddIn that extends Cake with Git features using LibGit2 and LibGit2Sharp
+Cake AddIn that extends Cake with Git features using LibGit2 and LibGit2Sharp.
 
 | Build server                | Platform     | Status                                                                                                                    |
 |-----------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------|
@@ -11,7 +11,7 @@ Cake AddIn that extends Cake with Git features using LibGit2 and LibGit2Sharp
 
 ## Documentation
 
-Documentation available at [cakebuild.net/dsl/git](http://cakebuild.net/dsl/git)
+Documentation available at [cakebuild.net/dsl/git](http://cakebuild.net/dsl/git).
 
 ## Example usage
 ```cake
