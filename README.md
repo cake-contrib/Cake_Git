@@ -11,7 +11,7 @@ Cake AddIn that extends Cake with Git features using LibGit2 and LibGit2Sharp.
 
 ## Documentation
 
-Documentation available at [cakebuild.net/dsl/git](http://cakebuild.net/dsl/git).
+Documentation is available at [cakebuild.net/dsl/git](http://cakebuild.net/dsl/git).
 
 ## Example usage
 ```cake
