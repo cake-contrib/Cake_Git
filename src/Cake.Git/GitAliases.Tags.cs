@@ -18,7 +18,7 @@ namespace Cake.Git
         /// <param name="repositoryDirectoryPath"></param>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
-        [CakeAliasCategory("AllTags")]
+        [CakeAliasCategory("Tags")]
         public static List<Tag> GitTags(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath)
