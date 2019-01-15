@@ -20,8 +20,8 @@
     <PackageReference Include="Cake.Core" Version="0.28.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="LibGit2Sharp" Version="0.25.2" />
-    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.217" />
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0070" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.258" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="Microsoft.CSharp" />
