@@ -680,10 +680,12 @@ Task("Git-Create-Branch")
 .Does(() =>
 {
     var branchName = "Foo";
-    GitCreateBranch(testInitalRepo, branchName, true);
+    var createdBranch = GitCreateBranch(testInitalRepo, branchName, true);
+    if (createdBranch.FriendlyName != branchName)
+        throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
     var branch = GitBranchCurrent(testInitalRepo);
     if (branch.FriendlyName != branchName)
-     throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
+        throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
 });
 
 Task("Git-Remote-Branch")
