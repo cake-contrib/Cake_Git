@@ -67,7 +67,7 @@ namespace Cake.Git
         ///   </code>
         /// </example>
         [CakeMethodAlias]
-        public static void GitCreateBranch(this ICakeContext context, DirectoryPath repositoryDirectoryPath, string branchName, bool checkOut)
+        public static GitBranch GitCreateBranch(this ICakeContext context, DirectoryPath repositoryDirectoryPath, string branchName, bool checkOut)
         {
             if (context == null)
             {
@@ -84,13 +84,19 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(branchName));
             }
 
-            context.UseRepository(repositoryDirectoryPath, 
+            return context.UseRepository(repositoryDirectoryPath, 
                 repository => 
                 {
                     var localBranch = repository.CreateBranch(branchName);
 
-                    if (checkOut) Commands.Checkout(repository, localBranch);
+                    if (checkOut)
+                    {
+                        Commands.Checkout(repository, localBranch);
+                    }
+
+                    return new GitBranch(repository);
                 });
+
         }
     }
 }
