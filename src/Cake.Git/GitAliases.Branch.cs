@@ -29,7 +29,7 @@ namespace Cake.Git
         ///   </code>
         /// </example>
         [CakeMethodAlias]
-        [CakeAliasCategory("Branch")]
+        [CakeAliasCategory("Branches")]
         public static GitBranch GitBranchCurrent(this ICakeContext context, DirectoryPath repositoryDirectoryPath)
         {
             if (context == null)
