@@ -25,7 +25,7 @@ namespace Cake.Git
         /// <param name="tagName">The tag name.</param>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
-        [CakeAliasCategory("Tag")]
+        [CakeAliasCategory("Tags")]
         public static void GitTag(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath,

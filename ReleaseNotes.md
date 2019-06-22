@@ -1,3 +1,10 @@
+### New in 0.20.0 (Released 2019/06/22)
+
+* Bumped Cake.Core to 0.33.0
+* GitCreateBranch returns GitBranch
+* Fix GitLog
+* Unify tags documentation
+
 ### New in 0.19.0 (Released 2018/08/23)
 
 * Ported to .NET Standard 2.0

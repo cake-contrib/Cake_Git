@@ -133,7 +133,7 @@ namespace Cake.Git
                     return repository.Commits
                         .QueryBy(new CommitFilter
                         {
-                            IncludeReachableFrom = sinceCommitId,
+                            IncludeReachableFrom = repository.Head,
                             ExcludeReachableFrom = repository.Lookup<Commit>(sinceCommitId).Parents
                         })
                         .Select(commit => new GitCommit(commit))

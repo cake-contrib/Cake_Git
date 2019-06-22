@@ -189,6 +189,17 @@ Task("Git-Init-Commit")
     Information("Commit created:\r\n{0}", initalCommit);
 });
 
+Task("Git-Second-Commit")
+    .IsDependentOn("Git-Init-Commit")
+    .Does(() =>
+{
+    var filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.new", Guid.NewGuid()));
+    CreateRandomDataFile(Context, filePath);
+    GitAdd(testInitalRepo, filePath);
+    var secondCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Second commit");
+    Information("Commit created:\r\n{0}", secondCommit);
+});
+
 Task("Git-HasUncommitedChanges-Dirty")
     .IsDependentOn("Git-Init-Add")
     .Does(() =>
@@ -223,9 +234,9 @@ Task("Git-Init-Diff")
 });
 
 Task("Git-Log-TipToCommitId")
-    .IsDependentOn("Git-Init-Commit")
+    .IsDependentOn("Git-Second-Commit")
     .Does(() =>
-{
+{    
     var commits = GitLog(testInitalRepo, initalCommit.Sha);
     foreach(var commit in commits)
     {
@@ -669,10 +680,12 @@ Task("Git-Create-Branch")
 .Does(() =>
 {
     var branchName = "Foo";
-    GitCreateBranch(testInitalRepo, branchName, true);
+    var createdBranch = GitCreateBranch(testInitalRepo, branchName, true);
+    if (createdBranch.FriendlyName != branchName)
+        throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
     var branch = GitBranchCurrent(testInitalRepo);
     if (branch.FriendlyName != branchName)
-     throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
+        throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
 });
 
 Task("Git-Remote-Branch")

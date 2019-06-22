@@ -10,9 +10,9 @@ using System;
 [assembly: AssemblyDescription("Cake Git AddIn")]
 [assembly: AssemblyCompany("WCOM AB")]
 [assembly: AssemblyProduct("Cake.Git")]
-[assembly: AssemblyVersion("0.19.0")]
-[assembly: AssemblyFileVersion("0.19.0")]
-[assembly: AssemblyInformationalVersion("0.19.0")]
-[assembly: AssemblyCopyright("Copyright © WCOM AB 2018")]
+[assembly: AssemblyVersion("0.20.0")]
+[assembly: AssemblyFileVersion("0.20.0")]
+[assembly: AssemblyInformationalVersion("0.20.0")]
+[assembly: AssemblyCopyright("Copyright © WCOM AB 2019")]
 [assembly: CLSCompliant(true)]
 
