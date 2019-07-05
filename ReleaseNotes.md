@@ -1,3 +1,7 @@
+### New in 0.21.0 (Released 2019/07/05)
+
+* Update to LibGit2Sharp 0.26.0
+
 ### New in 0.20.0 (Released 2019/06/22)
 
 * Bumped Cake.Core to 0.33.0
