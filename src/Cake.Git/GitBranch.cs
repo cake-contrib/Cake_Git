@@ -58,6 +58,21 @@ namespace Cake.Git
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="GitBranch"/> class for a LibGit2Sharp branch instance.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="branch">The branch.</param>
+        internal GitBranch(Repository repository, Branch branch)
+        {
+            CanonicalName = branch.CanonicalName;
+            FriendlyName = branch.FriendlyName;
+            Tip = new GitCommit(branch.Tip);
+            IsRemote = branch.IsRemote;
+            RemoteName = branch.RemoteName;
+            Remotes = System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(repository.Network.Remotes, remote => new GitRemote(remote.Name, remote.PushUrl, remote.Url)));
+        }
+
+        /// <summary>
         /// Generates a string representation of <see cref="GitBranch"/>
         /// </summary>
         /// <returns><see cref="GitBranch"/> as string</returns>

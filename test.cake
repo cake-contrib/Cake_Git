@@ -706,13 +706,26 @@ Task("Git-Current-Branch")
     Information("Current branch: {0}", branch);
 });
 
-Task("Git-Create-Branch")
+Task("Git-Create-Branch-With-Checkout")
 .Does(() =>
 {
-    var branchName = "Foo";
+    var branchName = "Foo-With-Checkout";
     var createdBranch = GitCreateBranch(testInitalRepo, branchName, true);
     if (createdBranch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
+    var branch = GitBranchCurrent(testInitalRepo);
+    if (branch.FriendlyName != branchName)
+        throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
+});
+
+Task("Git-Create-Branch-Without-Checkout")
+.Does(() =>
+{
+    var branchName = "Foo-Without-Checkout";
+    var createdBranch = GitCreateBranch(testInitalRepo, branchName, false);
+    if (createdBranch.FriendlyName != branchName)
+        throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
+    GitCheckout(testInitalRepo, branchName);
     var branch = GitBranchCurrent(testInitalRepo);
     if (branch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
@@ -855,7 +868,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
-    .IsDependentOn("Git-Create-Branch")
+    .IsDependentOn("Git-Create-Branch-With-Checkout")
+    .IsDependentOn("Git-Create-Branch-Without-Checkout")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
@@ -888,7 +902,8 @@ Task("Local-Tests")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
-    .IsDependentOn("Git-Create-Branch")
+    .IsDependentOn("Git-Create-Branch-With-Checkout")
+    .IsDependentOn("Git-Create-Branch-Without-Checkout")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
