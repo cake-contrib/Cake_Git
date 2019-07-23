@@ -41,7 +41,7 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 Description             = assemblyInfo.Description,
                                 Summary                 = "Cake AddIn that extends Cake with Git SCM features",
                                 ProjectUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/"),
-                                IconUrl                 = new Uri("https://cdn.rawgit.com/cake-contrib/graphics/a5cf0f881c390650144b2243ae551d5b9f836196/png/cake-contrib-medium.png"),
+                                IconUrl                 = new Uri("https://cdn.jsdelivr.net/gh/cake-contrib/graphics/png/cake-contrib-medium.png"),
                                 LicenseUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/blob/master/LICENSE.md"),
                                 Copyright               = assemblyInfo.Copyright,
                                 ReleaseNotes            = releaseNotes.Notes.ToArray(),
@@ -203,13 +203,15 @@ Task("Create-NuGet-Package")
     var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
     var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
     var coreNative = GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/**/*")
-                        - GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/win7-x86/**/*");
+                        - GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/win-x86/**/*");
+
     nuGetPackSettings.Files =  (native + libGit + cakeGit)
                                     .Where(file=>!file.FullPath.Contains("Cake.Core.") && !file.FullPath.Contains("/runtimes/"))
                                     .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
                                     .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
                                     .Union(
                                         coreNative
+                                            .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
                                             .Select(file=>new NuSpecContent {
                                                 Source = file.FullPath.Substring(artifactsRoot.FullPath.Length+1),
                                                 Target = "lib/netstandard2.0/" + file.GetFilename()

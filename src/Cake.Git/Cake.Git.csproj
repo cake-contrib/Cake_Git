@@ -17,11 +17,9 @@
     <ProjectGuid>{08F0A5C3-0E9C-451D-B003-14FF73699BE1}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.33.0">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="LibGit2Sharp" Version="0.25.2" />
-    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.217" />
+    <PackageReference Include="Cake.Core" Version="0.33.0" PrivateAssets="All" />
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.267" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="Microsoft.CSharp" />
