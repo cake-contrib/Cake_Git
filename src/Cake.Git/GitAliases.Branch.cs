@@ -67,6 +67,7 @@ namespace Cake.Git
         ///   </code>
         /// </example>
         [CakeMethodAlias]
+        [CakeAliasCategory("Branch")]
         public static GitBranch GitCreateBranch(this ICakeContext context, DirectoryPath repositoryDirectoryPath, string branchName, bool checkOut)
         {
             if (context == null)
