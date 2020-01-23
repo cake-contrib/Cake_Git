@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using System;
+using LibGit2Sharp;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace Cake.Git
@@ -49,6 +50,11 @@ namespace Cake.Git
         /// <param name="repository">The repository.</param>
         public GitBranch(Repository repository)
         {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
             CanonicalName = repository.Head.CanonicalName;
             FriendlyName = repository.Head.FriendlyName;
             Tip = new GitCommit(repository.Head.Tip);
@@ -64,6 +70,16 @@ namespace Cake.Git
         /// <param name="branch">The branch.</param>
         internal GitBranch(Repository repository, Branch branch)
         {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
+            if (branch == null)
+            {
+                throw new ArgumentNullException(nameof(branch));
+            }
+
             CanonicalName = branch.CanonicalName;
             FriendlyName = branch.FriendlyName;
             Tip = new GitCommit(branch.Tip);
