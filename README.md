@@ -14,6 +14,7 @@ Cake AddIn that extends Cake with Git features using LibGit2 and LibGit2Sharp.
 Documentation is available at [cakebuild.net/dsl/git](http://cakebuild.net/dsl/git).
 
 ## Example usage
+
 ```cake
 #addin nuget:?package=Cake.Git
 
@@ -33,8 +34,10 @@ Information(@"Last commit {0}
     lastCommit.Committer.When
     );
 ```
+
 ### Example output
-```
+
+```bash
 Last commit fb5b9805e543d8d1715886f78c273dc45b51a928
     Short message: Added Travis test folding
     Author:        Mattias Karlsson
