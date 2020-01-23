@@ -94,7 +94,7 @@ namespace Cake.Git
                         Commands.Checkout(repository, localBranch);
                     }
 
-                    return new GitBranch(repository);
+                    return new GitBranch(repository, localBranch);
                 });
 
         }
