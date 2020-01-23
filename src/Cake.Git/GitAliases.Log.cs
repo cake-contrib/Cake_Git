@@ -25,7 +25,7 @@ namespace Cake.Git
         /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Last commit in the repository passed in <paramref name="repositoryDirectoryPath"/>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
@@ -61,7 +61,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="count">Number of commits to fetch.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Commits in the repository passed in <paramref name="repositoryDirectoryPath"/>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
@@ -101,7 +101,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="sinceCommitId">Commit id to start fetching from.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Commits in the repository passed in <paramref name="repositoryDirectoryPath"/> which have <paramref name="sinceCommitId"/> as parent.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
@@ -205,7 +205,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="commitId">Commit id to lookup.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Commits with ID <paramref name="commitId"/>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
