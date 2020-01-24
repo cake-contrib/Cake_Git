@@ -508,26 +508,24 @@ Task("Git-Annotated-Tag-Apply")
 Task("Git-AllTags")
     .IsDependentOn("Git-Tag")
     .Does(()=>
-    {
-        var tags = GitTags(testInitalRepo);
-        if(tags.Count(t=>t.FriendlyName == "test-tag") < 1)
-            throw new Exception("test-tag not found");
-        if(tags.Count(t=>t.FriendlyName == "test-tag-objectish") < 1)
-            throw new Exception("test-tag not found");
-    }
-    );
+{
+    var tags = GitTags(testInitalRepo);
+    if(tags.Count(t=>t.FriendlyName == "test-tag") < 1)
+        throw new Exception("test-tag not found");
+    if(tags.Count(t=>t.FriendlyName == "test-tag-objectish") < 1)
+        throw new Exception("test-tag not found");
+});
 
 Task("Git-AllTags-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(()=>
-    {
-        var tags = GitTags(testInitalRepo);
-        if(tags.Count(t=>t.FriendlyName == "test-annotated-tag") < 1)
-            throw new Exception("test-annotated-tag not found");
-        if(tags.Count(t=>t.FriendlyName == "test-annotated-tag-objectish") < 1)
-            throw new Exception("test-annotated-tag-objectish not found");
-    }
-    );
+{
+    var tags = GitTags(testInitalRepo);
+    if(tags.Count(t=>t.FriendlyName == "test-annotated-tag") < 1)
+        throw new Exception("test-annotated-tag not found");
+    if(tags.Count(t=>t.FriendlyName == "test-annotated-tag-objectish") < 1)
+        throw new Exception("test-annotated-tag-objectish not found");
+});
 
 Task("Git-Describe-Generic")
     .IsDependentOn("Git-Tag")
@@ -790,6 +788,42 @@ Task("Git-Clean")
         throw new InvalidOperationException("Git clean is not working properly");
 });
 
+Task("Git-Log-Tag")
+    .IsDependentOn("Git-Describe")
+    .IsDependentOn("Git-Describe-Annotated")
+    .Does(() =>
+{
+    var filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.new", Guid.NewGuid()));
+    CreateRandomDataFile(Context, filePath);
+    GitAdd(testInitalRepo, filePath);
+    GitCommit(testInitalRepo, testUser, testUserEmail, "Third commit");
+    CreateRandomDataFile(Context, filePath);
+    GitAdd(testInitalRepo, filePath);
+    GitCommit(testInitalRepo, testUser, testUserEmail, "Fourth commit");
+    CreateRandomDataFile(Context, filePath);
+    GitAdd(testInitalRepo, filePath);
+    GitCommit(testInitalRepo, testUser, testUserEmail, "Fifth commit");
+
+    var commitsSinceTag = GitLogTag(testInitalRepo, "test-tag");
+
+    ValidateGitLogTag(commitsSinceTag, "Third commit", "Fourth commit", "Fifth commit"); 
+
+    void ValidateGitLogTag(ICollection<GitCommit> commits, params string[] commitMessages)
+    {
+        if(commits.Count() != 3)
+            throw new InvalidOperationException("Commit count should be 3 since 3 commits were added since test-tag");
+
+        foreach(var commitMessage in commitMessages)
+        {
+            if(!commits.Any(c => c.MessageShort == commitMessage)){
+                var msg = $"Commit log since tag did not contain commit with message `{commitMessage}`";
+                Error(msg);
+                throw new InvalidOperationException(msg);
+            }
+            Information($"Found {commitMessage}");
+        }
+    }
+});
 
 
 
@@ -849,6 +883,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-HasUncommitedChanges-Clean")
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
+    .IsDependentOn("Git-Log-Tag")
     .IsDependentOn("Git-Remove")
     .IsDependentOn("Git-Remove-Commit")
     .IsDependentOn("Git-Remove-Diff")
@@ -887,6 +922,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-HasUncommitedChanges-Clean")
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
+    .IsDependentOn("Git-Log-Tag")
     .IsDependentOn("Git-Remove")
     .IsDependentOn("Git-Remove-Commit")
     .IsDependentOn("Git-Remove-Diff")
