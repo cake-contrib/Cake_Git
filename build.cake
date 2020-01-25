@@ -43,7 +43,7 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 ProjectUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/"),
                                 Repository              = new NuGetRepository { Type = "git", Url = "https://github.com/cake-contrib/Cake_Git.git" },
                                 IconUrl                 = new Uri("https://cdn.jsdelivr.net/gh/cake-contrib/graphics/png/cake-contrib-medium.png"),
-                                LicenseUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/blob/master/LICENSE.md"),
+                                License                 = new NuSpecLicense { Type = "expression", Value = "MIT" },
                                 Copyright               = assemblyInfo.Copyright,
                                 ReleaseNotes            = releaseNotes.Notes.ToArray(),
                                 Tags                    = new [] {"Cake", "Script", "Build", "Git"},
