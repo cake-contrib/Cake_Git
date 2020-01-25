@@ -202,11 +202,12 @@ Task("Create-NuGet-Package")
 {
     var native = GetFiles(artifactsRoot.FullPath + "/net461/lib/**/*");
     var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
+    var cakeGitDoc = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.xml");
     var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
     var coreNative = GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/**/*")
                         - GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/win-x86/**/*");
 
-    nuGetPackSettings.Files =  (native + libGit + cakeGit)
+    nuGetPackSettings.Files =  (native + libGit + cakeGit + cakeGitDoc)
                                     .Where(file=>!file.FullPath.Contains("Cake.Core.") && !file.FullPath.Contains("/runtimes/"))
                                     .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
                                     .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
