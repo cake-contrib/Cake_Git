@@ -1,3 +1,4 @@
+using System;
 using LibGit2Sharp;
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -35,6 +36,11 @@ namespace Cake.Git
 
         internal GitDiffFile(TreeEntryChanges change)
         {
+            if (change == null)
+            {
+                throw new ArgumentNullException(nameof(change));
+            }
+
             Path = change.Path;
             OldPath = change.OldPath;
             Status = (GitChangeKind)change.Status;
