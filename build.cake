@@ -41,6 +41,7 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 Description             = assemblyInfo.Description,
                                 Summary                 = "Cake AddIn that extends Cake with Git SCM features",
                                 ProjectUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/"),
+                                Repository              = new NuGetRepository { Type = "git", Url = "https://github.com/cake-contrib/Cake_Git.git" },
                                 IconUrl                 = new Uri("https://cdn.jsdelivr.net/gh/cake-contrib/graphics/png/cake-contrib-medium.png"),
                                 LicenseUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/blob/master/LICENSE.md"),
                                 Copyright               = assemblyInfo.Copyright,
