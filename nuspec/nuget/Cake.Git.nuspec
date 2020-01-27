@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Cake.Git</id>
+    <title>Cake.Git</title>
+    <version>0.0.0</version>
+    <authors>WCOM AB</authors>
+    <owners>WCOM AB, cake-contrib</owners>
+    <summary>Cake AddIn that extends Cake with Git SCM features</summary>
+    <description>Cake Git AddIn</description>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/cake-contrib/Cake_Git</projectUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/cake-contrib/graphics@a5cf0f881c390650144b2243ae551d5b9f836196/png/cake-contrib-medium.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <repository type="git" url="https://github.com/cake-contrib/Cake_Git.git"/>
+    <copyright>Copyright © WCOM AB 2020</copyright>
+    <tags>Cake Script Build Git</tags>
+    <releaseNotes></releaseNotes>
+  </metadata>
+  <files>
+    <file src="net461\Cake.Git.dll" target="lib\net461" />
+    <file src="net461\Cake.Git.pdb" target="lib\net461" />
+    <file src="net461\Cake.Git.xml" target="lib\net461" />
+    <file src="netstandard2.0\Cake.Git.dll" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\Cake.Git.pdb" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\Cake.Git.xml" target="lib\netstandard2.0" />
+  </files>
+</package>
