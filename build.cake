@@ -17,7 +17,8 @@ var version             = releaseNotes.Version.ToString();
 var binDir              = MakeAbsolute(Directory("./src/Cake.Git/bin/" + configuration + "/net461"));
 var nugetRoot           = "./nuget/";
 var artifactsRoot       = MakeAbsolute(Directory("./artifacts/"));
-var semVersion          = isLocalBuild
+var semVersion          = isLocalBuild || (AppVeyor.Environment.Repository.Tag.IsTag
+                                            && !string.IsNullOrWhiteSpace(AppVeyor.Environment.Repository.Tag.Name))
                                 ? version
                                 : string.Concat(version, "-build-", AppVeyor.Environment.Build.Number.ToString("0000"));
 
