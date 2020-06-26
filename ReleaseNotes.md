@@ -1,3 +1,17 @@
+### New in 0.22.0 (Released 2020/06/26)
+
+* Use SPDX expression for license of NuGet package
+* Update documentation for GitLog aliases
+* Add XML comments to NuGet package
+* Remove transitive dependency from project file
+* Add missing alias category for GitCreateBranch
+* Add repository metadata to NuGet package
+* Add missing null reference checks
+* New alias "GitBranches" for retrieving all branches of a repository.
+* Update to LibGit2Sharp 0.26.2
+* Added support for listing commits since a tag
+* Inconsistency between GitClone aliases
+
 ### New in 0.21.0 (Released 2019/07/05)
 
 * Update to LibGit2Sharp 0.26.0
