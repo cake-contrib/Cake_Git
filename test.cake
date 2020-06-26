@@ -408,6 +408,20 @@ Task("Git-Clone")
     Information("Cloned {0}.", repo);
 });
 
+Task("Git-Clone-WithCredentials")
+    .IsDependentOn("Clean")
+    .Does(() =>
+{
+    var sourceUrl = "https://github.com/WCOMAB/CakeGitTestRepo.git";
+    Information("Cloning repo {0}...", sourceUrl);
+    if (DirectoryExists(testCloneRepo))
+    {
+        ForceDeleteDirectory(testCloneRepo.FullPath);
+    }
+    var repo = GitClone(sourceUrl, testCloneRepo, "foo", "bar");
+    Information("Cloned {0}.", repo);
+});
+
 Task("Git-Clone-WithSettings")
     .IsDependentOn("Clean")
     .Does(() =>
@@ -419,6 +433,22 @@ Task("Git-Clone-WithSettings")
         ForceDeleteDirectory(testCloneRepo.FullPath);
     }
     var repo = GitClone(sourceUrl, testCloneRepo, new GitCloneSettings {
+        IsBare = true
+    });
+    Information("Cloned {0}.", repo);
+});
+
+Task("Git-Clone-WithCredentialsAndSettings")
+    .IsDependentOn("Clean")
+    .Does(() =>
+{
+    var sourceUrl = "https://github.com/WCOMAB/CakeGitTestRepo.git";
+    Information("Cloning bare repo {0}...", sourceUrl);
+    if (DirectoryExists(testCloneRepo))
+    {
+        ForceDeleteDirectory(testCloneRepo.FullPath);
+    }
+    var repo = GitClone(sourceUrl, testCloneRepo, "foo", "bar", new GitCloneSettings {
         IsBare = true
     });
     Information("Cloned {0}.", repo);
@@ -478,26 +508,24 @@ Task("Git-Annotated-Tag-Apply")
 Task("Git-AllTags")
     .IsDependentOn("Git-Tag")
     .Does(()=>
-    {
-        var tags = GitTags(testInitalRepo);
-        if(tags.Count(t=>t.FriendlyName == "test-tag") < 1)
-            throw new Exception("test-tag not found");
-        if(tags.Count(t=>t.FriendlyName == "test-tag-objectish") < 1)
-            throw new Exception("test-tag not found");
-    }
-    );
+{
+    var tags = GitTags(testInitalRepo);
+    if(tags.Count(t=>t.FriendlyName == "test-tag") < 1)
+        throw new Exception("test-tag not found");
+    if(tags.Count(t=>t.FriendlyName == "test-tag-objectish") < 1)
+        throw new Exception("test-tag not found");
+});
 
 Task("Git-AllTags-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(()=>
-    {
-        var tags = GitTags(testInitalRepo);
-        if(tags.Count(t=>t.FriendlyName == "test-annotated-tag") < 1)
-            throw new Exception("test-annotated-tag not found");
-        if(tags.Count(t=>t.FriendlyName == "test-annotated-tag-objectish") < 1)
-            throw new Exception("test-annotated-tag-objectish not found");
-    }
-    );
+{
+    var tags = GitTags(testInitalRepo);
+    if(tags.Count(t=>t.FriendlyName == "test-annotated-tag") < 1)
+        throw new Exception("test-annotated-tag not found");
+    if(tags.Count(t=>t.FriendlyName == "test-annotated-tag-objectish") < 1)
+        throw new Exception("test-annotated-tag-objectish not found");
+});
 
 Task("Git-Describe-Generic")
     .IsDependentOn("Git-Tag")
@@ -676,13 +704,26 @@ Task("Git-Current-Branch")
     Information("Current branch: {0}", branch);
 });
 
-Task("Git-Create-Branch")
+Task("Git-Create-Branch-With-Checkout")
 .Does(() =>
 {
-    var branchName = "Foo";
+    var branchName = "Foo-With-Checkout";
     var createdBranch = GitCreateBranch(testInitalRepo, branchName, true);
     if (createdBranch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
+    var branch = GitBranchCurrent(testInitalRepo);
+    if (branch.FriendlyName != branchName)
+        throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
+});
+
+Task("Git-Create-Branch-Without-Checkout")
+.Does(() =>
+{
+    var branchName = "Foo-Without-Checkout";
+    var createdBranch = GitCreateBranch(testInitalRepo, branchName, false);
+    if (createdBranch.FriendlyName != branchName)
+        throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
+    GitCheckout(testInitalRepo, branchName);
     var branch = GitBranchCurrent(testInitalRepo);
     if (branch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
@@ -747,6 +788,42 @@ Task("Git-Clean")
         throw new InvalidOperationException("Git clean is not working properly");
 });
 
+Task("Git-Log-Tag")
+    .IsDependentOn("Git-Describe")
+    .IsDependentOn("Git-Describe-Annotated")
+    .Does(() =>
+{
+    var filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.new", Guid.NewGuid()));
+    CreateRandomDataFile(Context, filePath);
+    GitAdd(testInitalRepo, filePath);
+    GitCommit(testInitalRepo, testUser, testUserEmail, "Third commit");
+    CreateRandomDataFile(Context, filePath);
+    GitAdd(testInitalRepo, filePath);
+    GitCommit(testInitalRepo, testUser, testUserEmail, "Fourth commit");
+    CreateRandomDataFile(Context, filePath);
+    GitAdd(testInitalRepo, filePath);
+    GitCommit(testInitalRepo, testUser, testUserEmail, "Fifth commit");
+
+    var commitsSinceTag = GitLogTag(testInitalRepo, "test-tag");
+
+    ValidateGitLogTag(commitsSinceTag, "Third commit", "Fourth commit", "Fifth commit"); 
+
+    void ValidateGitLogTag(ICollection<GitCommit> commits, params string[] commitMessages)
+    {
+        if(commits.Count() != 3)
+            throw new InvalidOperationException("Commit count should be 3 since 3 commits were added since test-tag");
+
+        foreach(var commitMessage in commitMessages)
+        {
+            if(!commits.Any(c => c.MessageShort == commitMessage)){
+                var msg = $"Commit log since tag did not contain commit with message `{commitMessage}`";
+                Error(msg);
+                throw new InvalidOperationException(msg);
+            }
+            Information($"Found {commitMessage}");
+        }
+    }
+});
 
 
 
@@ -806,6 +883,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-HasUncommitedChanges-Clean")
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
+    .IsDependentOn("Git-Log-Tag")
     .IsDependentOn("Git-Remove")
     .IsDependentOn("Git-Remove-Commit")
     .IsDependentOn("Git-Remove-Diff")
@@ -816,14 +894,17 @@ Task("Default-Tests")
     .IsDependentOn("Git-Modify-Commit")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Clone")
+    .IsDependentOn("Git-Clone-WithCredentials")
     .IsDependentOn("Git-Clone-WithSettings")
+    .IsDependentOn("Git-Clone-WithCredentialsAndSettings")
     .IsDependentOn("Git-Diff")
     .IsDependentOn("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
-    .IsDependentOn("Git-Create-Branch")
+    .IsDependentOn("Git-Create-Branch-With-Checkout")
+    .IsDependentOn("Git-Create-Branch-Without-Checkout")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
@@ -841,6 +922,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-HasUncommitedChanges-Clean")
     .IsDependentOn("Git-Init-Diff")
     .IsDependentOn("Git-Log")
+    .IsDependentOn("Git-Log-Tag")
     .IsDependentOn("Git-Remove")
     .IsDependentOn("Git-Remove-Commit")
     .IsDependentOn("Git-Remove-Diff")
@@ -856,7 +938,8 @@ Task("Local-Tests")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
     .IsDependentOn("Git-Current-Branch")
-    .IsDependentOn("Git-Create-Branch")
+    .IsDependentOn("Git-Create-Branch-With-Checkout")
+    .IsDependentOn("Git-Create-Branch-Without-Checkout")
     .IsDependentOn("Git-Remote-Branch")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")

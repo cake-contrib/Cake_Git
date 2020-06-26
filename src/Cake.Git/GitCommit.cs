@@ -53,7 +53,7 @@ namespace Cake.Git
         {
             if (commit == null)
             {
-                throw new ArgumentException("Source commit can't be null.", nameof(commit));
+                throw new ArgumentNullException(nameof(commit));
             }
 
             Sha = commit.Sha;

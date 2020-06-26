@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using System;
+using LibGit2Sharp;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace Cake.Git
@@ -49,11 +50,41 @@ namespace Cake.Git
         /// <param name="repository">The repository.</param>
         public GitBranch(Repository repository)
         {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
             CanonicalName = repository.Head.CanonicalName;
             FriendlyName = repository.Head.FriendlyName;
             Tip = new GitCommit(repository.Head.Tip);
             IsRemote = repository.Head.IsRemote;
             RemoteName = repository.Head.RemoteName;
+            Remotes = System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(repository.Network.Remotes, remote => new GitRemote(remote.Name, remote.PushUrl, remote.Url)));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GitBranch"/> class for a LibGit2Sharp branch instance.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="branch">The branch.</param>
+        internal GitBranch(Repository repository, Branch branch)
+        {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
+            if (branch == null)
+            {
+                throw new ArgumentNullException(nameof(branch));
+            }
+
+            CanonicalName = branch.CanonicalName;
+            FriendlyName = branch.FriendlyName;
+            Tip = new GitCommit(branch.Tip);
+            IsRemote = branch.IsRemote;
+            RemoteName = branch.RemoteName;
             Remotes = System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(repository.Network.Remotes, remote => new GitRemote(remote.Name, remote.PushUrl, remote.Url)));
         }
 

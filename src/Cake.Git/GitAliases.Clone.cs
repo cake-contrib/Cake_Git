@@ -187,10 +187,7 @@ namespace Cake.Git
 
             var workFullDirectoryPath = workDirectoryPath.MakeAbsolute(context.Environment);
 
-            if (!context.FileSystem.Exist(workFullDirectoryPath))
-            {
-                throw new DirectoryNotFoundException($"Failed to find workDirectoryPath: {workFullDirectoryPath}");
-            }
+            context.FileSystem.GetDirectory(workFullDirectoryPath).Create();
 
             var options = new CloneOptions
             {
@@ -265,10 +262,7 @@ namespace Cake.Git
 
             var workFullDirectoryPath = workDirectoryPath.MakeAbsolute(context.Environment);
 
-            if (!context.FileSystem.Exist(workFullDirectoryPath))
-            {
-                throw new DirectoryNotFoundException($"Failed to find workDirectoryPath: {workFullDirectoryPath}");
-            }
+            context.FileSystem.GetDirectory(workFullDirectoryPath).Create();
 
             var options = cloneSettings.ToCloneOptions();
             options.CredentialsProvider =

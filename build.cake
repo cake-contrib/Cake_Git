@@ -17,7 +17,8 @@ var version             = releaseNotes.Version.ToString();
 var binDir              = MakeAbsolute(Directory("./src/Cake.Git/bin/" + configuration + "/net461"));
 var nugetRoot           = "./nuget/";
 var artifactsRoot       = MakeAbsolute(Directory("./artifacts/"));
-var semVersion          = isLocalBuild
+var semVersion          = isLocalBuild || (AppVeyor.Environment.Repository.Tag.IsTag
+                                            && !string.IsNullOrWhiteSpace(AppVeyor.Environment.Repository.Tag.Name))
                                 ? version
                                 : string.Concat(version, "-build-", AppVeyor.Environment.Build.Number.ToString("0000"));
 
@@ -41,8 +42,9 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 Description             = assemblyInfo.Description,
                                 Summary                 = "Cake AddIn that extends Cake with Git SCM features",
                                 ProjectUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/"),
+                                Repository              = new NuGetRepository { Type = "git", Url = "https://github.com/cake-contrib/Cake_Git.git" },
                                 IconUrl                 = new Uri("https://cdn.jsdelivr.net/gh/cake-contrib/graphics/png/cake-contrib-medium.png"),
-                                LicenseUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/blob/master/LICENSE.md"),
+                                License                 = new NuSpecLicense { Type = "expression", Value = "MIT" },
                                 Copyright               = assemblyInfo.Copyright,
                                 ReleaseNotes            = releaseNotes.Notes.ToArray(),
                                 Tags                    = new [] {"Cake", "Script", "Build", "Git"},
@@ -201,11 +203,12 @@ Task("Create-NuGet-Package")
 {
     var native = GetFiles(artifactsRoot.FullPath + "/net461/lib/**/*");
     var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
+    var cakeGitDoc = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.xml");
     var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
     var coreNative = GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/**/*")
                         - GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/win-x86/**/*");
 
-    nuGetPackSettings.Files =  (native + libGit + cakeGit)
+    nuGetPackSettings.Files =  (native + libGit + cakeGit + cakeGitDoc)
                                     .Where(file=>!file.FullPath.Contains("Cake.Core.") && !file.FullPath.Contains("/runtimes/"))
                                     .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
                                     .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
@@ -296,6 +299,19 @@ Task("Publish-MyGet")
     });
 });
 
+Task("Upload-AppVeyor-Artifacts")
+    .IsDependentOn("Create-NuGet-Package")
+    .IsDependentOn("Test")
+    .WithCriteria(() => !isLocalBuild)
+    .Does(() =>
+{
+    // Get the path to the package.
+    var package = nugetRoot + "Cake.Git." + semVersion + ".nupkg";
+
+    // Upload Artifact
+    AppVeyor.UploadArtifact(package);
+});
+
 
 Task("Default")
     .IsDependentOn("Create-NuGet-Package")
@@ -306,6 +322,7 @@ Task("Local-Tests")
     .IsDependentOn("Test");
 
 Task("AppVeyor")
+    .IsDependentOn("Upload-AppVeyor-Artifacts")
     .IsDependentOn("Publish-MyGet");
 
 Task("Travis")

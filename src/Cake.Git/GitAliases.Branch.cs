@@ -29,7 +29,7 @@ namespace Cake.Git
         ///   </code>
         /// </example>
         [CakeMethodAlias]
-        [CakeAliasCategory("Branch")]
+        [CakeAliasCategory("Branches")]
         public static GitBranch GitBranchCurrent(this ICakeContext context, DirectoryPath repositoryDirectoryPath)
         {
             if (context == null)
@@ -67,6 +67,7 @@ namespace Cake.Git
         ///   </code>
         /// </example>
         [CakeMethodAlias]
+        [CakeAliasCategory("Branch")]
         public static GitBranch GitCreateBranch(this ICakeContext context, DirectoryPath repositoryDirectoryPath, string branchName, bool checkOut)
         {
             if (context == null)
@@ -94,7 +95,7 @@ namespace Cake.Git
                         Commands.Checkout(repository, localBranch);
                     }
 
-                    return new GitBranch(repository);
+                    return new GitBranch(repository, localBranch);
                 });
 
         }

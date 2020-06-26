@@ -25,7 +25,7 @@ namespace Cake.Git
         /// </example>
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Last commit in the repository passed in <paramref name="repositoryDirectoryPath"/>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
@@ -61,7 +61,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="count">Number of commits to fetch.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Commits in the repository passed in <paramref name="repositoryDirectoryPath"/>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
@@ -101,7 +101,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="sinceCommitId">Commit id to start fetching from.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Commits in the repository passed in <paramref name="repositoryDirectoryPath"/> which have <paramref name="sinceCommitId"/> as parent.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
@@ -143,6 +143,58 @@ namespace Cake.Git
         }
 
         /// <summary>
+        /// Get commits after a certain tag
+        /// </summary>
+        /// <example>
+        /// <code>
+        ///     var result = GitLogTag("c:/temp/cake", "since tag");
+        /// </code>
+        /// </example>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Path to repository.</param>
+        /// <param name="sinceTag">Tag to start fetching from.</param>
+        /// <returns>Commits since the tag passed with <paramref name="sinceTag"/></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Log")]
+        public static ICollection<GitCommit> GitLogTag(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            string sinceTag
+            )
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (repositoryDirectoryPath == null)
+            {
+                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
+            }
+
+            if (string.IsNullOrWhiteSpace(sinceTag))
+            {
+                throw new ArgumentNullException(nameof(sinceTag));
+            }
+
+            return context.UseRepository(
+                repositoryDirectoryPath,
+                repository =>
+                {
+                    return repository.Commits
+                        .QueryBy(new CommitFilter
+                        {
+                            IncludeReachableFrom = repository.Head,
+                            ExcludeReachableFrom = repository.Tags[sinceTag].Target.Sha
+                        })
+                        .Select(commit => new GitCommit(commit))
+                        .ToList();
+                }
+                );
+        }
+
+        /// <summary>
         /// Get specific commit.
         /// </summary>
         /// <example>
@@ -153,7 +205,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="commitId">Commit id to lookup.</param>
-        /// <returns>The path to the created repository.</returns>
+        /// <returns>Commits with ID <paramref name="commitId"/>.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Log")]
