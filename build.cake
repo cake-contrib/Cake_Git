@@ -298,6 +298,19 @@ Task("Publish-MyGet")
     });
 });
 
+Task("Upload-AppVeyor-Artifacts")
+    .IsDependentOn("Create-NuGet-Package")
+    .IsDependentOn("Test")
+    .WithCriteria(() => !isLocalBuild)
+    .Does(() =>
+{
+    // Get the path to the package.
+    var package = nugetRoot + "Cake.Git." + semVersion + ".nupkg";
+
+    // Upload Artifact
+    AppVeyor.UploadArtifact(package);
+});
+
 
 Task("Default")
     .IsDependentOn("Create-NuGet-Package")
@@ -308,6 +321,7 @@ Task("Local-Tests")
     .IsDependentOn("Test");
 
 Task("AppVeyor")
+    .IsDependentOn("Upload-AppVeyor-Artifacts")
     .IsDependentOn("Publish-MyGet");
 
 Task("Travis")
