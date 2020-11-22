@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using Cake.Core;
 using Cake.Core.Annotations;
@@ -194,7 +195,7 @@ namespace Cake.Git
                 if (Repository.IsValid(fsPath.FullPath))
                     return fsPath;
                 var parentDir = fsPath.Combine("../").Collapse();
-                if (!context.FileSystem.Exist(parentDir))
+                if (!context.FileSystem.Exist(parentDir) || new DirectoryInfo(parentDir.FullPath).Parent == null)
                     throw new RepositoryNotFoundException($"Path '{path}' doesn't point at a valid Git repository or workdir.");
                 fsPath = parentDir;
             }
