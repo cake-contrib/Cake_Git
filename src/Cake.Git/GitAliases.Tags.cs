@@ -12,8 +12,12 @@ namespace Cake.Git
     partial class GitAliases
     {
         /// <summary>
-        /// Gets a list of all tags from the repo
+        /// Gets a list of all tags from the repository.
         /// </summary>
+        /// <remarks>
+        /// If you need to access the targets of the tags use <see cref="GitTags(ICakeContext, DirectoryPath, bool)"/>
+        /// to make sure targerts are loaded.
+        /// </remarks>
         /// <param name="context"></param>
         /// <param name="repositoryDirectoryPath"></param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -29,8 +33,48 @@ namespace Cake.Git
             if (repositoryDirectoryPath == null)
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
 
+            return context.GitTags(repositoryDirectoryPath, false);
+        }
+
+        /// <summary>
+        /// Gets a list of all tags from the repository with the option to load targets of the tags.
+        /// </summary>
+        /// <remarks>
+        /// If you need to access the targets of the tags, set <paramref name="loadTargets"/> to <see langword="true"/>.
+        /// This will make sure that the targets are loaded before the <see cref="Repository"/> is disposed.
+        /// Otherwise, accessing a tag's target will throw an exception.
+        /// </remarks>
+        /// <param name="context"></param>
+        /// <param name="repositoryDirectoryPath"></param>
+        /// <param name="loadTargets">A value indicating whether targets of the tags should be loaded.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Tags")]
+        public static List<Tag> GitTags(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            bool loadTargets)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (repositoryDirectoryPath == null)
+                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
+
             var retval =
-                context.UseRepository(repositoryDirectoryPath, repo => SortedTags(repo.Tags, t => t));
+                context.UseRepository(
+                    repositoryDirectoryPath,
+                    repo => SortedTags(
+                        repo.Tags,
+                        t =>
+                        {
+                            if (loadTargets)
+                            {
+                                _ = t.PeeledTarget;
+                            }
+
+                            return t;
+                        }));
 
             return retval;
         }
