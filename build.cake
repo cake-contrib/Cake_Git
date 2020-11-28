@@ -269,36 +269,6 @@ Task("Test")
     executeTests();
 });
 
-
-
-Task("Publish-MyGet")
-    .IsDependentOn("Create-NuGet-Package")
-    .IsDependentOn("Test")
-    .WithCriteria(() => !isLocalBuild)
-    .WithCriteria(() => !isPullRequest)
-    .Does(() =>
-{
-    // Resolve the API key.
-    var apiKey = EnvironmentVariable("MYGET_API_KEY");
-    if(string.IsNullOrEmpty(apiKey)) {
-        throw new InvalidOperationException("Could not resolve MyGet API key.");
-    }
-
-    var source = EnvironmentVariable("MYGET_SOURCE");
-    if(string.IsNullOrEmpty(apiKey)) {
-        throw new InvalidOperationException("Could not resolve MyGet source.");
-    }
-
-    // Get the path to the package.
-    var package = nugetRoot + "Cake.Git." + semVersion + ".nupkg";
-
-    // Push the package.
-    NuGetPush(package, new NuGetPushSettings {
-        Source = source,
-        ApiKey = apiKey
-    });
-});
-
 Task("Upload-AppVeyor-Artifacts")
     .IsDependentOn("Create-NuGet-Package")
     .IsDependentOn("Test")
@@ -322,8 +292,7 @@ Task("Local-Tests")
     .IsDependentOn("Test");
 
 Task("AppVeyor")
-    .IsDependentOn("Upload-AppVeyor-Artifacts")
-    .IsDependentOn("Publish-MyGet");
+    .IsDependentOn("Upload-AppVeyor-Artifacts");
 
 Task("Travis")
     .IsDependentOn("Test");
