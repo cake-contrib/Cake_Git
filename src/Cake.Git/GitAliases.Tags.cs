@@ -18,8 +18,9 @@ namespace Cake.Git
         /// If you need to access the targets of the tags use <see cref="GitTags(ICakeContext, DirectoryPath, bool)"/>
         /// to make sure targerts are loaded.
         /// </remarks>
-        /// <param name="context"></param>
-        /// <param name="repositoryDirectoryPath"></param>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Path to repository.</param>
+        /// <returns>List of all tags from the repository.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Tags")]
@@ -44,9 +45,10 @@ namespace Cake.Git
         /// This will make sure that the targets are loaded before the <see cref="Repository"/> is disposed.
         /// Otherwise, accessing a tag's target will throw an exception.
         /// </remarks>
-        /// <param name="context"></param>
-        /// <param name="repositoryDirectoryPath"></param>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="loadTargets">A value indicating whether targets of the tags should be loaded.</param>
+        /// <returns>List of all tags from the repository.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Tags")]
