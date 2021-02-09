@@ -1,3 +1,9 @@
+### New in 1.0.0 (Released 2021/02/09)
+
+* Update Cake.Git to target Cake v1.0.0
+* Issue with accessing Tag properties
+* Exception TargetInvocationException in GitTags(..)
+
 ### New in 0.22.0 (Released 2020/06/26)
 
 * Use SPDX expression for license of NuGet package

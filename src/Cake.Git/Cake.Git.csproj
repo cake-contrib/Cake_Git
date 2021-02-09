@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net461;net5.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -17,10 +17,14 @@
     <ProjectGuid>{08F0A5C3-0E9C-451D-B003-14FF73699BE1}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.33.0" PrivateAssets="All" />
-    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="Cake.Core" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net461' ">
+    <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0096" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.312" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />

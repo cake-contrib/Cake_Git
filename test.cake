@@ -527,6 +527,20 @@ Task("Git-AllTags-Annotated")
         throw new Exception("test-annotated-tag-objectish not found");
 });
 
+Task("Git-AllTags-Targets")
+    .IsDependentOn("Git-Tag-Annotated")
+    .Does(() =>
+{
+    var tags = GitTags(testInitalRepo, loadTargets: true);
+
+    foreach (var tag in tags)
+    {
+        // When loadTargets is true, this should not throw an exception
+        _ = tag.Target;
+        _ = tag.PeeledTarget;
+    }
+});
+
 Task("Git-Describe-Generic")
     .IsDependentOn("Git-Tag")
     .Does(() =>
@@ -909,6 +923,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
     .IsDependentOn("Git-AllTags-Annotated")
+    .IsDependentOn("Git-AllTags-Targets")
     .IsDependentOn("Git-Clean");
 
 Task("Local-Tests")
@@ -944,6 +959,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-Checkout")
     .IsDependentOn("Git-AllTags")
     .IsDependentOn("Git-AllTags-Annotated")
+    .IsDependentOn("Git-AllTags-Targets")
     .IsDependentOn("Git-Clean");
 
 ///////////////////////////////////////////////////////////////////////////////
