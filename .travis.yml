@@ -3,9 +3,8 @@ os:
   - osx
   - linux
 
-# Ubuntu 16.04
 sudo: required
-dist: xenial
+dist: bionic
 
 osx_image: xcode11.2
 
