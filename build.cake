@@ -1,3 +1,10 @@
+// Install modules
+#module nuget:?package=Cake.DotNetTool.Module&version=0.4.0
+
+
+// Install .NET Global tools.
+#tool "dotnet:https://api.nuget.org/v3/index.json?package=Cake.Tool&version=1.0.0"
+
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,6 +201,14 @@ Task("Publish-Artifacts")
         MSBuildSettings = msBuildSettings,
         OutputDirectory = artifactsRoot + "/netstandard2.0"
     });
+
+    DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
+    {
+        NoRestore = true,
+        Framework = "net5.0",
+        MSBuildSettings = msBuildSettings,
+        OutputDirectory = artifactsRoot + "/net5.0"
+    });
 });
 
 
@@ -205,8 +220,8 @@ Task("Create-NuGet-Package")
     var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
     var cakeGitDoc = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.xml");
     var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
-    var coreNative = GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/**/*")
-                        - GetFiles(artifactsRoot.FullPath + "/netstandard2.0/runtimes/win-x86/**/*");
+    var coreNative = GetFiles(artifactsRoot.FullPath + "/net5.0/runtimes/**/*")
+                        - GetFiles(artifactsRoot.FullPath + "/net5.0/runtimes/win-x86/**/*");
 
     nuGetPackSettings.Files =  (native + libGit + cakeGit + cakeGitDoc)
                                     .Where(file=>!file.FullPath.Contains("Cake.Core.") && !file.FullPath.Contains("/runtimes/"))
@@ -218,6 +233,13 @@ Task("Create-NuGet-Package")
                                             .Select(file=>new NuSpecContent {
                                                 Source = file.FullPath.Substring(artifactsRoot.FullPath.Length+1),
                                                 Target = "lib/netstandard2.0/" + file.GetFilename()
+                                                })
+                                        ).Union(
+                                        coreNative
+                                            .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
+                                            .Select(file=>new NuSpecContent {
+                                                Source = file.FullPath.Substring(artifactsRoot.FullPath.Length+1),
+                                                Target = "lib/net5.0/" + file.GetFilename()
                                                 })
                                         )
                                     .ToArray();
@@ -246,14 +268,40 @@ Task("Test")
     Unzip(package, addinDir);
 
     Action executeTests = ()=> {
-        CakeExecuteScript("./testnet461.cake",
-            new CakeSettings{
-                Arguments = new Dictionary<string, string>{
-                    {"target", target == "Default" ? "Default-Tests" : "Local-Tests"}}});
+        var testArguments = new Dictionary<string, string>{
+                                {"target", target == "Default" ? "Default-Tests" : "Local-Tests"}
+                            };
 
-          DotNetCoreExecute(
+        Information("Testing net461");
+
+        CakeExecuteScript(
+            "./testnet461.cake",
+            new CakeSettings{
+                Arguments = testArguments,
+                ToolPath = Context.Tools.Resolve("Cake.exe")
+                }
+        );
+
+        Information("Testing net5.0");
+
+        CakeExecuteScript(
+            "./testnet50.cake",
+            new CakeSettings{
+                Arguments = testArguments,
+                ToolPath = IsRunningOnWindows()
+                                ?  "./tools/dotnet-cake.exe"
+                                : "./tools/dotnet-cake"
+                });
+
+        Information("Testing netstandard2");
+
+        DotNetCoreExecute(
             "./tools/Cake.CoreCLR/Cake.dll",
-            string.Concat("testnetstandard2.cake --target=", target == "Default" ? "Default-Tests" : "Local-Tests")
+            testArguments.Aggregate(
+                ProcessArgumentBuilder.FromString("testnetstandard2.cake"),
+                (args, kv) => args.AppendSwitchQuoted(string.Concat("--", kv.Key), "=", kv.Value),
+                args => args
+                )
             );
     };
 

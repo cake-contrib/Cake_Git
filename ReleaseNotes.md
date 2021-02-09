@@ -1,3 +1,7 @@
+### New in 1.0.0 (Released 2021/02/09)
+
+* Bumped Cake.Core to 1.0.0
+
 ### New in 0.22.0 (Released 2020/06/26)
 
 * Use SPDX expression for license of NuGet package
