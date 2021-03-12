@@ -1,5 +1,5 @@
 // Install modules
-#module nuget:?package=Cake.DotNetTool.Module&version=0.4.0
+#module nuget:?package=Cake.DotNetTool.Module&version=1.0.1
 
 
 // Install .NET Global tools.
@@ -54,7 +54,7 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 License                 = new NuSpecLicense { Type = "expression", Value = "MIT" },
                                 Copyright               = assemblyInfo.Copyright,
                                 ReleaseNotes            = releaseNotes.Notes.ToArray(),
-                                Tags                    = new [] {"Cake", "Script", "Build", "Git"},
+                                Tags                    = new [] { "Cake", "Script", "Build", "Git", "cake-addin" },
                                 RequireLicenseAcceptance= false,
                                 Symbols                 = false,
                                 NoPackageAnalysis       = true,
@@ -67,7 +67,9 @@ var msBuildSettings     = new DotNetCoreMSBuildSettings()
                             .WithProperty("Version", semVersion)
                             .WithProperty("AssemblyVersion", version)
                             .WithProperty("FileVersion", version)
-                            .WithProperty("PackageReleaseNotes", string.Concat("\"", string.Concat(releaseNotes.Notes.ToArray()), "\""));
+                            .WithProperty("PackageReleaseNotes", string.Concat("\"", string.Concat(releaseNotes.Notes.ToArray()), "\""))
+                            .WithProperty("ContinuousIntegrationBuild", AppVeyor.IsRunningOnAppVeyor ? "true" : "false")
+                            .WithProperty("EmbedUntrackedSources", "true");
 
 Context.Tools.RegisterFile("./tools/nuget.exe");
 

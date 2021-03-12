@@ -1,3 +1,7 @@
+### New in 1.0.1 (Released 2021/03/12)
+
+* Add cake-addin tag to NuGet package
+
 ### New in 1.0.0 (Released 2021/02/09)
 
 * Bumped Cake.Core to 1.0.0
