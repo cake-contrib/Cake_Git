@@ -4,6 +4,7 @@ using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
 using Cake.Git.Extensions;
+using LibGit2Sharp;
 
 namespace Cake.Git
 {
@@ -125,7 +126,7 @@ namespace Cake.Git
         /// <exception cref="ArgumentException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Configuration")]
-        public static void GitConfigSet<T>(
+        public static void GitConfigSetLocal<T>(
             this ICakeContext context,
             DirectoryPath repositoryDirectoryPath,
             string key,
@@ -141,7 +142,7 @@ namespace Cake.Git
                 throw new ArgumentException(nameof(repositoryDirectoryPath));
             }
 
-            context.UseRepository(repositoryDirectoryPath, repository => repository.Config.Set(key, newValue));
+            context.UseRepository(repositoryDirectoryPath, repository => repository.Config.Set(key, newValue, ConfigurationLevel.Local));
         }
         
         /// <summary>
@@ -207,7 +208,7 @@ namespace Cake.Git
         /// <exception cref="ArgumentException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Configuration")]
-        public static bool GitConfigExist<T>(this ICakeContext context, DirectoryPath repositoryDirectoryPath, string key)
+        public static bool GitConfigExists<T>(this ICakeContext context, DirectoryPath repositoryDirectoryPath, string key)
         {
             if (context is null)
             {

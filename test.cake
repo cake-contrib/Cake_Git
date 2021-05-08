@@ -839,6 +839,22 @@ Task("Git-Log-Tag")
     }
 });
 
+Task("Git-Config")
+    .Does(() =>
+{
+    GitConfigSetLocal(testInitalRepo, "user.email", "bob@example.com");
+    
+    if (GitConfigExists<string>(testInitalRepo, "user.email"))
+    {
+        string email = GitConfigGet<string>(testInitalRepo, "user.email");
+        
+        if (!string.Equals("bob@example.com", email))
+        {
+            throw new InvalidOperationException("Wrong email in configuration.");
+        }
+    }
+});
+
 
 
 Task("Git-Tag")
@@ -924,7 +940,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-AllTags")
     .IsDependentOn("Git-AllTags-Annotated")
     .IsDependentOn("Git-AllTags-Targets")
-    .IsDependentOn("Git-Clean");
+    .IsDependentOn("Git-Clean")
+    .IsDependentOn("Git-Config");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -960,7 +977,8 @@ Task("Local-Tests")
     .IsDependentOn("Git-AllTags")
     .IsDependentOn("Git-AllTags-Annotated")
     .IsDependentOn("Git-AllTags-Targets")
-    .IsDependentOn("Git-Clean");
+    .IsDependentOn("Git-Clean")
+    .IsDependentOn("Git-Config");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
