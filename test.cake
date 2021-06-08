@@ -855,7 +855,103 @@ Task("Git-Config")
     }
 });
 
+Task("Git-Fetch-Remote")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    var originDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
+    var testDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
 
+    try
+    {
+        // Arrange: create a repo and a clone, then add a commit in "origin"
+        GitClone((IsRunningOnWindows() ? "" : "file://") + testInitalRepo.FullPath, originDir);
+        GitClone((IsRunningOnWindows() ? "" : "file://") + originDir.FullPath, testDir);
+
+        // Arrange: Add a commit in origin
+        var file = originDir.CombineWithFilePath(File(Guid.NewGuid().ToString("d")+".txt"));
+        CreateRandomDataFile(Context, file);
+        GitAddAll(originDir);
+        var commit = GitCommit(originDir, testUser, testUserEmail, "test Git-Fetch-Remote");
+        Information("Added commit in origin: {0}", commit.Sha);
+
+        // Act
+        GitFetch(testDir);
+
+        // Assert
+        try
+        { 
+            var fetched = GitLogLookup(testDir, commit.Sha);
+            Information("Commit found after fetch: {0}", fetched.Sha);
+        } 
+        catch(ArgumentNullException)
+        {
+            Error("expected commit not found after fetch.");
+            throw new InvalidOperationException("expected commit not found after fetch.");
+        }
+    }
+    finally
+    {
+        // cleanup
+        var settings = new DeleteDirectorySettings {
+            Recursive = true,
+            Force = true
+        };
+        DeleteDirectory(originDir, settings);
+        DeleteDirectory(testDir, settings);
+    }
+});
+
+Task("Git-Fetch-Remote-Tags")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    var originDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
+    var testDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
+
+    try
+    {
+        // Arrange: create a repo and a clone, then add a commit and a tag in "origin"
+        GitClone((IsRunningOnWindows() ? "" : "file://")+testInitalRepo.FullPath, originDir);
+        GitClone((IsRunningOnWindows() ? "" : "file://")+originDir.FullPath, testDir);
+
+        // Arrange: Add a branch, commit and tag in origin and place it "before" our current commit. 
+        var someOldCommit = GitLog(originDir, 10).Last();
+        GitCheckout(originDir, someOldCommit.Sha);
+        var newBranch = GitCreateBranch(originDir, Guid.NewGuid().ToString("d"), true);
+        var file = originDir.CombineWithFilePath(File(Guid.NewGuid().ToString("d")+".txt"));
+        CreateRandomDataFile(Context, file);
+        GitAddAll(originDir);
+        var commit = GitCommit(originDir, testUser, testUserEmail, "test Git-Fetch-Remote");
+        var tagName = Guid.NewGuid().ToString("d");
+        GitTag(originDir, tagName);
+        Information("Tagged in origin: {0}", tagName);
+
+        // Act
+        GitFetchTags(testDir);
+
+        // Assert
+        var tags = GitTags(testDir);
+        var newTag = tags.FirstOrDefault(t => t.FriendlyName == tagName);
+        if(newTag == null)
+        {
+            Error("expected tag not found after fetch tags.");
+            throw new InvalidOperationException("expected tag not found after fetch tags.");
+        }
+
+        Information("Found tag: {0}", newTag.FriendlyName);
+    }
+    finally
+    {
+        // cleanup
+        var settings = new DeleteDirectorySettings {
+            Recursive = true,
+            Force = true
+        };
+        DeleteDirectory(originDir, settings);
+        DeleteDirectory(testDir, settings);
+    }
+});
 
 Task("Git-Tag")
     .IsDependentOn("Git-Tag-Apply")
@@ -941,7 +1037,9 @@ Task("Default-Tests")
     .IsDependentOn("Git-AllTags-Annotated")
     .IsDependentOn("Git-AllTags-Targets")
     .IsDependentOn("Git-Clean")
-    .IsDependentOn("Git-Config");
+    .IsDependentOn("Git-Config")
+    .IsDependentOn("Git-Fetch-Remote")
+    .IsDependentOn("Git-Fetch-Remote-Tags");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -978,7 +1076,9 @@ Task("Local-Tests")
     .IsDependentOn("Git-AllTags-Annotated")
     .IsDependentOn("Git-AllTags-Targets")
     .IsDependentOn("Git-Clean")
-    .IsDependentOn("Git-Config");
+    .IsDependentOn("Git-Config")
+    .IsDependentOn("Git-Fetch-Remote")
+    .IsDependentOn("Git-Fetch-Remote-Tags");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
