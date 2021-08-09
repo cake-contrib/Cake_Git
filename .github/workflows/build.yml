@@ -44,3 +44,9 @@ jobs:
         with:
           name: artifacts
           path: artifacts
+
+      - name: Upload NuGet Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuget
+          path: nuget
