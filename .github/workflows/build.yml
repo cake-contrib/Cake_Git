@@ -1,0 +1,46 @@
+name: Build
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - hotfix/*
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install .NET Core SDK 3.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+
+      - name: Install .NET Core SDK
+        uses: actions/setup-dotnet@v1
+
+      - if: matrix.os == 'windows-latest'
+        name: Run Cake script Windows
+        run: |
+          ./build.ps1
+
+      - if: matrix.os != 'windows-latest'
+        name: Run Cake script Posix
+        run: |
+          ./build.sh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
