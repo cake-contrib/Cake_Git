@@ -78,6 +78,12 @@ if (!isLocalBuild)
     AppVeyor.UpdateBuildVersion(semVersion);
 }
 
+if (BuildSystem.GitHubActions.IsRunningOnGitHubActions)
+{
+    TaskSetup(context=> System.Console.WriteLine($"::group::{context.Task.Name.Quote()}"));
+    TaskTeardown(context=>System.Console.WriteLine("::endgroup::"));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
 ///////////////////////////////////////////////////////////////////////////////

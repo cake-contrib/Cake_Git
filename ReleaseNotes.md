@@ -1,3 +1,8 @@
+### New in 1.1.0 (Released 2021/08/09)
+
+* Update LibGit2Sharp to 0.27.0-preview-0102
+* Add Basic Support for git Configuration Commands
+
 ### New in 1.0.1 (Released 2021/03/12)
 
 * Add cake-addin tag to NuGet package
