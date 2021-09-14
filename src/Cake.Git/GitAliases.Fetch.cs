@@ -33,26 +33,10 @@ namespace Cake.Git
             string remoteName = "origin"
             )
         {
-            if (context == null)
+            GitFetch(context, repositoryDirectoryPath, new GitFetchSettings
             {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (repositoryDirectoryPath == null)
-            {
-                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
-            }
-
-            context.UseRepository(
-                repositoryDirectoryPath,
-                repository =>
-                {
-                    // ReSharper disable once ConvertToConstant.Local
-                    var logMessage = "";
-                    var remote = repository.Network.Remotes[remoteName];
-                    var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                    Commands.Fetch(repository, remote.Name, refSpecs, null, logMessage);
-                });
+                Remote = remoteName
+            });
         }
 
         /// <summary>
@@ -75,6 +59,33 @@ namespace Cake.Git
             string remoteName = "origin"
             )
         {
+            GitFetch(context, repositoryDirectoryPath, new GitFetchSettings
+            {
+                Remote = remoteName,
+                TagFetchMode = TagFetchMode.All
+            });
+        }
+        
+        /// <summary>
+        /// Download from another repository.
+        /// </summary>
+        /// <example>
+        /// <code>
+        ///     GitFetchTags("c:/temp/cake");
+        /// </code>
+        /// </example>
+        /// <param name="context">The context.</param>
+        /// <param name="repositoryDirectoryPath">Path to repository.</param>
+        /// <param name="fetchSettings">The settings on what to fetch and how.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [CakeMethodAlias]
+        [CakeAliasCategory("Fetch")]
+        public static void GitFetch(
+            this ICakeContext context,
+            DirectoryPath repositoryDirectoryPath,
+            GitFetchSettings fetchSettings
+        )
+        {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
@@ -85,19 +96,56 @@ namespace Cake.Git
                 throw new ArgumentNullException(nameof(repositoryDirectoryPath));
             }
 
+            if (fetchSettings == null)
+            {
+                throw new ArgumentNullException(nameof(fetchSettings));
+            }
+
             context.UseRepository(
                 repositoryDirectoryPath,
                 repository =>
                 {
-                    // ReSharper disable once ConvertToConstant.Local
-                    var logMessage = "";
-                    var remote = repository.Network.Remotes[remoteName];
-                    var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+                    var remote = repository.Network.Remotes[fetchSettings.Remote];
+                    var refSpecs = remote.FetchRefSpecs
+                        .Where(fetchSettings.RefSpecFilter)
+                        .Select(x => x.Specification);
                     Commands.Fetch(repository, remote.Name, refSpecs, new FetchOptions
                     {
-                        TagFetchMode = TagFetchMode.All
-                    }, logMessage);
+                        TagFetchMode = fetchSettings.TagFetchMode,
+                        Prune = fetchSettings.Prune
+                    }, string.Empty);
                 });
         }
+    }
+
+    /// <summary>
+    /// Settings for the fetch operation.
+    /// </summary>
+    public class GitFetchSettings
+    {
+        /// <summary>
+        /// Gets or sets the name of the remote to fetch from.
+        /// Default is <c>"origin"</c>.
+        /// </summary>
+        public string Remote { get; set; } = "origin";
+        
+        /// <summary>
+        /// Gets or sets a filter which RefSpecs to fetch.
+        /// Default is all.
+        /// </summary>
+        public Func<RefSpec, bool> RefSpecFilter { get; set; } = _ => true;
+
+        /// <summary>
+        /// Gets or sets how tags are being fetched.
+        /// </summary>
+        /// <seealso cref="FetchOptions.TagFetchMode"/>
+        public TagFetchMode? TagFetchMode { get; set; }
+        
+        /// <summary>
+        /// Gets or sets whether to prune during fetch.
+        /// Default is <c>null</c>
+        /// </summary>
+        /// <seealso cref="FetchOptions.Prune"/>
+        public bool? Prune { get; set; }
     }
 }
