@@ -855,7 +855,58 @@ Task("Git-Config")
     }
 });
 
+Task("Git-ShortenSha-length")
+    .IsDependentOn("Git-Init-Commit")
+    .Does(() =>
+{
+    // Arrange
+    const int min = 20;
+    var commit = GitLogTip(testInitalRepo);
 
+    // Act
+    var shortSha = GitShortenSha(testInitalRepo, commit, min);
+
+    Information("Sha      {0}", commit.Sha);
+    Information("ShortSha {0}", shortSha);
+    
+    if(shortSha.Length < min) 
+    {
+        throw new InvalidOperationException($"Short SHA is expected to have a minimal length of {min}.");
+    }
+
+    if(shortSha.Length >= commit.Sha.Length) 
+    {
+        throw new InvalidOperationException("Short SHA is expected to be shorter.");
+    }
+
+    if(!commit.Sha.StartsWith(shortSha)) 
+    {
+        throw new InvalidOperationException("Short SHA is expected to match the start of the full SHA.");
+    }
+});
+
+Task("Git-ShortenSha-no-length")
+    .IsDependentOn("Git-Init-Commit")
+    .Does(() =>
+{
+    // Arrange
+    var commit = GitLogTip(testInitalRepo);
+
+    // Act
+    var shortSha = GitShortenSha(testInitalRepo, commit);
+
+    Information("Sha      {0}", commit.Sha);
+    Information("ShortSha {0}", shortSha);
+    if(shortSha.Length >= commit.Sha.Length) 
+    {
+        throw new InvalidOperationException("Short SHA is expected to be shorter.");
+    }
+
+    if(!commit.Sha.StartsWith(shortSha)) 
+    {
+        throw new InvalidOperationException("Short SHA is expected to match the start of the full SHA.");
+    }
+});
 
 Task("Git-Tag")
     .IsDependentOn("Git-Tag-Apply")
@@ -902,6 +953,10 @@ Task("Git-HasUncommitedChanges")
     .IsDependentOn("Git-HasUncommitedChanges-Dirty")
     .IsDependentOn("Git-HasUncommitedChanges-Clean");
 
+Task("Git-ShortenSha")
+    .IsDependentOn("Git-ShortenSha-no-length")
+    .IsDependentOn("Git-ShortenSha-length");
+
 Task("Default-Tests")
     .IsDependentOn("Git-Init")
     .IsDependentOn("Git-IsValidRepository-LocalRepo")
@@ -941,7 +996,8 @@ Task("Default-Tests")
     .IsDependentOn("Git-AllTags-Annotated")
     .IsDependentOn("Git-AllTags-Targets")
     .IsDependentOn("Git-Clean")
-    .IsDependentOn("Git-Config");
+    .IsDependentOn("Git-Config")
+    .IsDependentOn("Git-ShortenSha");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -978,7 +1034,8 @@ Task("Local-Tests")
     .IsDependentOn("Git-AllTags-Annotated")
     .IsDependentOn("Git-AllTags-Targets")
     .IsDependentOn("Git-Clean")
-    .IsDependentOn("Git-Config");
+    .IsDependentOn("Git-Config")
+    .IsDependentOn("Git-ShortenSha");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
