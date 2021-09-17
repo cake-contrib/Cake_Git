@@ -24,7 +24,7 @@ namespace Cake.Git
         /// <param name="context">The context.</param>
         /// <param name="repositoryDirectoryPath">Path to repository.</param>
         /// <param name="commit">The Commit whose Sha should be shortened.</param>
-        /// <param name="minimalLength">The minimal length of the shortened SHA.</param>
+        /// <param name="minimalLength">The minimal length of the shortened SHA. The default is 7 (seven) characters.</param>
         /// <exception cref="ArgumentNullException"></exception>
         [CakeMethodAlias]
         [CakeAliasCategory("Sha")]
