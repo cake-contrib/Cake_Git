@@ -1,9 +1,4 @@
-// Install modules
-#module nuget:?package=Cake.DotNetTool.Module&version=1.0.1
-
-
-// Install .NET Global tools.
-#tool "dotnet:https://api.nuget.org/v3/index.json?package=Cake.Tool&version=1.0.0"
+#tool nuget:?package=NuGet.CommandLine&version=6.0.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -71,8 +66,6 @@ var msBuildSettings     = new DotNetCoreMSBuildSettings()
                             .WithProperty("PackageReleaseNotes", string.Concat("\"", string.Concat(releaseNotes.Notes.ToArray()), "\""))
                             .WithProperty("ContinuousIntegrationBuild", AppVeyor.IsRunningOnAppVeyor ? "true" : "false")
                             .WithProperty("EmbedUntrackedSources", "true");
-
-Context.Tools.RegisterFile("./tools/nuget.exe");
 
 if (!isLocalBuild)
 {
@@ -198,17 +191,9 @@ Task("Publish-Artifacts")
     DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
     {
         NoRestore = true,
-        Framework = "net461",
+        Framework = "netcoreapp3.1",
         MSBuildSettings = msBuildSettings,
-        OutputDirectory = artifactsRoot + "/net461"
-    });
-
-    DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
-    {
-        NoRestore = true,
-        Framework = "netstandard2.0",
-        MSBuildSettings = msBuildSettings,
-        OutputDirectory = artifactsRoot + "/netstandard2.0"
+        OutputDirectory = artifactsRoot + "/netcoreapp3.1"
     });
 
     DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
@@ -218,6 +203,14 @@ Task("Publish-Artifacts")
         MSBuildSettings = msBuildSettings,
         OutputDirectory = artifactsRoot + "/net5.0"
     });
+
+    DotNetCorePublish("./src/Cake.Git", new DotNetCorePublishSettings
+    {
+        NoRestore = true,
+        Framework = "net6.0",
+        MSBuildSettings = msBuildSettings,
+        OutputDirectory = artifactsRoot + "/net6.0"
+    });
 });
 
 
@@ -225,33 +218,28 @@ Task("Create-NuGet-Package")
     .IsDependentOn("Publish-Artifacts")
     .Does(() =>
 {
-    var native = GetFiles(artifactsRoot.FullPath + "/net461/lib/**/*");
     var cakeGit = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.dll");
     var cakeGitDoc = GetFiles(artifactsRoot.FullPath + "/**/Cake.Git.xml");
     var libGit = GetFiles(artifactsRoot.FullPath + "/**/LibGit2Sharp*");
-    var coreNative = GetFiles(artifactsRoot.FullPath + "/net5.0/runtimes/**/*")
-                        - GetFiles(artifactsRoot.FullPath + "/net5.0/runtimes/win-x86/**/*");
+    var unmanaged = GetFiles(artifactsRoot.FullPath + "/net6.0/runtimes/**/*");
 
-    nuGetPackSettings.Files =  (native + libGit + cakeGit + cakeGitDoc)
-                                    .Where(file=>!file.FullPath.Contains("Cake.Core.") && !file.FullPath.Contains("/runtimes/"))
+    nuGetPackSettings.Files =  (libGit + cakeGit + cakeGitDoc)
                                     .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
                                     .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
-                                    .Union(
-                                        coreNative
-                                            .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
-                                            .Select(file=>new NuSpecContent {
+                                    // add unmanaged dlls to the "right" place in the nuget
+                                    .Union(unmanaged
+                                        .Select(file=>file.FullPath.Substring(artifactsRoot.FullPath.Length+1))
+                                        .Select(file=>new NuSpecContent {Source = file, Target = "/" + file.Substring(7)}))
+                                    // cake scripting needs the unmanaged dlls to be in the "wrong" place for some reason..
+                                    .Union(unmanaged
+                                        .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
+                                        .SelectMany(file => new[]{ "netcoreapp3.1", "net5.0", "net6.0" }.Select(tfm => 
+                                            new NuSpecContent {
                                                 Source = file.FullPath.Substring(artifactsRoot.FullPath.Length+1),
-                                                Target = "lib/netstandard2.0/" + file.GetFilename()
-                                                })
-                                        ).Union(
-                                        coreNative
-                                            .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
-                                            .Select(file=>new NuSpecContent {
-                                                Source = file.FullPath.Substring(artifactsRoot.FullPath.Length+1),
-                                                Target = "lib/net5.0/" + file.GetFilename()
-                                                })
-                                        )
-                                    .Concat(new []
+                                                Target = $"lib/{tfm}/{file.GetFilename()}"
+                                            })))
+                                    // add the icon
+                                    .Union(new []
                                     {
                                         new NuSpecContent
                                         {
@@ -289,14 +277,13 @@ Task("Test")
                                 {"target", target == "Default" ? "Default-Tests" : "Local-Tests"}
                             };
 
-        Information("Testing net461");
+        Information("Testing netcoreapp3.1");
 
         CakeExecuteScript(
-            "./testnet461.cake",
+            "./testnetcoreapp31.cake",
             new CakeSettings{
-                Arguments = testArguments,
-                ToolPath = Context.Tools.Resolve("Cake.exe")
-                }
+                Arguments = testArguments
+            }
         );
 
         Information("Testing net5.0");
@@ -304,22 +291,16 @@ Task("Test")
         CakeExecuteScript(
             "./testnet50.cake",
             new CakeSettings{
-                Arguments = testArguments,
-                ToolPath = IsRunningOnWindows()
-                                ?  "./tools/dotnet-cake.exe"
-                                : "./tools/dotnet-cake"
-                });
+                Arguments = testArguments
+            });
 
-        Information("Testing netstandard2");
+        Information("Testing net6.0");
 
-        DotNetCoreExecute(
-            "./tools/Cake.CoreCLR/Cake.dll",
-            testArguments.Aggregate(
-                ProcessArgumentBuilder.FromString("testnetstandard2.cake"),
-                (args, kv) => args.AppendSwitchQuoted(string.Concat("--", kv.Key), "=", kv.Value),
-                args => args
-                )
-            );
+        CakeExecuteScript(
+            "./testnet60.cake",
+            new CakeSettings{
+                Arguments = testArguments
+            });
     };
 
     if (TravisCI.IsRunningOnTravisCI)

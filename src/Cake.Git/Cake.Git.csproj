@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
@@ -18,17 +18,10 @@
     <ProjectGuid>{08F0A5C3-0E9C-451D-B003-14FF73699BE1}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
     <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0102" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.312" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0102" />
-    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.312" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="Cake.Core" Version="2.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs" Link="Properties\SolutionInfo.cs" />
