@@ -45,3 +45,9 @@ Last commit fb5b9805e543d8d1715886f78c273dc45b51a928
     Committer:     Mattias Karlsson
     Committed:     2016-08-16 085836
 ```
+
+## Discussion
+
+For questions and to discuss ideas & feature requests, use the [GitHub discussions on the Cake GitHub repository](https://github.com/cake-build/cake/discussions), under the [Extension Q&A](https://github.com/cake-build/cake/discussions/categories/extension-q-a) category.
+
+[![Join in the discussion on the Cake repository](https://img.shields.io/badge/GitHub-Discussions-green?logo=github)](https://github.com/cake-build/cake/discussions)
