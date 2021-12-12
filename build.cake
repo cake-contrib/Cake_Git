@@ -50,7 +50,8 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 Summary                 = "Cake AddIn that extends Cake with Git SCM features",
                                 ProjectUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/"),
                                 Repository              = new NuGetRepository { Type = "git", Url = "https://github.com/cake-contrib/Cake_Git.git" },
-                                IconUrl                 = new Uri("https://cdn.jsdelivr.net/gh/cake-contrib/graphics/png/cake-contrib-medium.png"),
+                                Icon                    = "images/icon.png",
+                                IconUrl                 = new Uri("https://cdn.jsdelivr.net/gh/cake-contrib/graphics/png/addin/cake-contrib-addin-medium.png"),
                                 License                 = new NuSpecLicense { Type = "expression", Value = "MIT" },
                                 Copyright               = assemblyInfo.Copyright,
                                 ReleaseNotes            = releaseNotes.Notes.ToArray(),
@@ -250,6 +251,14 @@ Task("Create-NuGet-Package")
                                                 Target = "lib/net5.0/" + file.GetFilename()
                                                 })
                                         )
+                                    .Concat(new []
+                                    {
+                                        new NuSpecContent
+                                        {
+                                            Source = MakeAbsolute(File("./asset/cake-contrib-addin-medium.png")).FullPath,
+                                            Target = "images/icon.png",
+                                        },
+                                    })
                                     .ToArray();
 
     if (!DirectoryExists(nugetRoot))
