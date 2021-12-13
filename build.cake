@@ -377,7 +377,7 @@ public record BuildData(
     BuildPaths BuildPaths)
 {
     public string NuGetSource { get; } = System.Environment.GetEnvironmentVariable("NUGET_SOURCE");
-    public string NuGetApiKey { get; } = System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
+    public string NuGetApiKey { get; } = System.Environment.GetEnvironmentVariable("NUGET_API_KEY");
     public bool ShouldPushNuGetPackages() =>    IsMainBranch &&
                                                 ShouldPublish &&
                                                 !string.IsNullOrWhiteSpace(NuGetSource) &&
