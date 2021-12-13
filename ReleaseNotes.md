@@ -1,3 +1,13 @@
+### New in 2.0.0 (Released 2021/12/13)
+
+* Update Cake.Git to target Cake v2.0.0
+* Fix infinite loop in GitFindRootFromPath
+* Added another alias for git fetch
+* Update Cake.Git NuGet package icon to the new Cake-Contrib logo for Cake addin
+* Added an alias GitShortenSha
+* Update LibGit2Sharp to 0.27.0-preview-0102
+* update LibGit2Sharp.NativeBinaries to 2.0.312
+
 ### New in 1.1.0 (Released 2021/08/09)
 
 * Update LibGit2Sharp to 0.27.0-preview-0102
