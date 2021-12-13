@@ -10,7 +10,7 @@ var target          = Argument<string>("target", "Default-Tests");
 ///////////////////////////////////////////////////////////////////////////////
 
 var testRepo                = MakeAbsolute(Directory("./TestRepo"));
-var testInitalRepo          = MakeAbsolute(Directory("./TestRepo/InitalRepo"));
+var testInitialRepo         = MakeAbsolute(Directory("./TestRepo/InitialRepo"));
 var testCloneRepo           = MakeAbsolute(Directory("./TestRepo/CloneRepo"));
 var isLocalBuild            = !AppVeyor.IsRunningOnAppVeyor;
 var releaseNotes            = ParseReleaseNotes("./ReleaseNotes.md");
@@ -23,7 +23,7 @@ var testUserEmail           = "john@doe.com";
 FilePath[]  testFiles       = null,
             testDeleteFiles = null,
             testModifyFiles = null;
-GitCommit   initalCommit    = null,
+GitCommit   initialCommit   = null,
             removeCommit    = null,
             modifiedCommit  = null;
 
@@ -69,7 +69,7 @@ Teardown(ctx =>
     }
     catch(Exception ex)
     {
-        Error("Failed to clean up test reop {0}\r\n{1}", testRepo, ex);
+        Error("Failed to clean up test repo {0}\r\n{1}", testRepo, ex);
     }
 });
 
@@ -94,8 +94,8 @@ Task("Git-Init")
 {
     Information("Creating repository...");
     CreateDirectory(testRepo);
-    CreateDirectory(testInitalRepo);
-    var repo = GitInit(testInitalRepo);
+    CreateDirectory(testInitialRepo);
+    var repo = GitInit(testInitialRepo);
     if (!DirectoryExists(repo))
     {
         throw new DirectoryNotFoundException (string.Format("Failed to create repository {0}",
@@ -110,9 +110,9 @@ Task("Git-IsValidRepository-LocalRepo")
     .Does(() =>
 {
     Information("Checking if local repository is recognized as a valid repository...");
-    if (!GitIsValidRepository(testInitalRepo)) {
+    if (!GitIsValidRepository(testInitialRepo)) {
         throw new Exception(string.Format("Initialized repository at '{0}' is not a valid Git repository.",
-            testInitalRepo));
+            testInitialRepo));
     }
 });
 
@@ -136,7 +136,7 @@ Task("Create-Test-Files")
                     .Range(1, 10)
                     .Select(
                         index=> {
-                            FilePath filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.{1:000}",
+                            FilePath filePath = testInitialRepo.CombineWithFilePath(string.Format("{0}.{1:000}",
                                 Guid.NewGuid(),
                                 index
                                 ));
@@ -158,7 +158,7 @@ Task("Create-Untracked-Test-Files")
         .Range(1, 10)
         .Select(
             index=> {
-                FilePath filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.{1:000}",
+                FilePath filePath = testInitialRepo.CombineWithFilePath(string.Format("{0}.{1:000}",
                     Guid.NewGuid(),
                     index
                     ));
@@ -177,7 +177,7 @@ Task("Git-Init-Add")
     .Does(() =>
 {
     Information("Adding test files...");
-    GitAdd(testInitalRepo, testFiles);
+    GitAdd(testInitialRepo, testFiles);
 });
 
 Task("Git-Init-Commit")
@@ -185,18 +185,18 @@ Task("Git-Init-Commit")
     .Does(() =>
 {
     Information("Committing files...");
-    initalCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Inital commit");
-    Information("Commit created:\r\n{0}", initalCommit);
+    initialCommit = GitCommit(testInitialRepo, testUser, testUserEmail, "Initial commit");
+    Information("Commit created:\r\n{0}", initialCommit);
 });
 
 Task("Git-Second-Commit")
     .IsDependentOn("Git-Init-Commit")
     .Does(() =>
 {
-    var filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.new", Guid.NewGuid()));
+    var filePath = testInitialRepo.CombineWithFilePath(string.Format("{0}.new", Guid.NewGuid()));
     CreateRandomDataFile(Context, filePath);
-    GitAdd(testInitalRepo, filePath);
-    var secondCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Second commit");
+    GitAdd(testInitialRepo, filePath);
+    var secondCommit = GitCommit(testInitialRepo, testUser, testUserEmail, "Second commit");
     Information("Commit created:\r\n{0}", secondCommit);
 });
 
@@ -205,7 +205,7 @@ Task("Git-HasUncommitedChanges-Dirty")
     .Does(() =>
 {
     Information("Checking if repository has uncommited changes...");
-    if (!GitHasUncommitedChanges(testInitalRepo))
+    if (!GitHasUncommitedChanges(testInitialRepo))
     {
         throw new Exception("Repository doesn't report uncommited changes.");
     };
@@ -216,7 +216,7 @@ Task("Git-HasUncommitedChanges-Clean")
     .Does(() =>
 {
     Information("Checking if repository has uncommited changes...");
-    if (GitHasUncommitedChanges(testInitalRepo))
+    if (GitHasUncommitedChanges(testInitialRepo))
     {
         throw new Exception("Repository reports uncommited changes after commiting all files.");
     };
@@ -226,7 +226,7 @@ Task("Git-Init-Diff")
     .IsDependentOn("Git-Init-Commit")
     .Does(() =>
 {
-    var diffFiles = GitDiff(testInitalRepo);
+    var diffFiles = GitDiff(testInitialRepo);
     foreach(var diffFile in diffFiles)
     {
         Information("{0}", diffFile);
@@ -236,8 +236,8 @@ Task("Git-Init-Diff")
 Task("Git-Log-TipToCommitId")
     .IsDependentOn("Git-Second-Commit")
     .Does(() =>
-{    
-    var commits = GitLog(testInitalRepo, initalCommit.Sha);
+{
+    var commits = GitLog(testInitialRepo, initialCommit.Sha);
     foreach(var commit in commits)
     {
         Information("{0}", commit);
@@ -248,7 +248,7 @@ Task("Git-Log-Tip")
     .IsDependentOn("Git-Init-Commit")
     .Does(() =>
 {
-    var commit = GitLogTip(testInitalRepo);
+    var commit = GitLogTip(testInitialRepo);
     Information("{0}", commit);
 });
 
@@ -256,7 +256,7 @@ Task("Git-Log-TipToRange")
     .IsDependentOn("Git-Init-Commit")
     .Does(() =>
 {
-    var commits = GitLog(testInitalRepo, byte.MaxValue);
+    var commits = GitLog(testInitialRepo, byte.MaxValue);
     foreach(var commit in commits)
     {
         Information("{0}", commit);
@@ -267,7 +267,7 @@ Task("Git-Log-Lookup")
     .IsDependentOn("Git-Init-Commit")
     .Does(() =>
 {
-    var commit = GitLogLookup(testInitalRepo, initalCommit.Sha);
+    var commit = GitLogLookup(testInitialRepo, initialCommit.Sha);
     Information("{0}", commit);
 });
 
@@ -277,7 +277,7 @@ Task("Git-Remove")
 {
     Information("Removing files...");
     testDeleteFiles = testFiles.Take(5).ToArray();
-    GitRemove(testInitalRepo, true, testDeleteFiles);
+    GitRemove(testInitialRepo, true, testDeleteFiles);
     var existingFiles = testDeleteFiles.Where(FileExists).ToList();
     if (existingFiles.Count > 0)
     {
@@ -296,7 +296,7 @@ Task("Git-Remove-Commit")
     .Does(() =>
 {
     Information("Committing removed files...");
-    removeCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Remove commit");
+    removeCommit = GitCommit(testInitialRepo, testUser, testUserEmail, "Remove commit");
     Information("Commit created:\r\n{0}", removeCommit);
 });
 
@@ -304,7 +304,7 @@ Task("Git-Remove-Diff")
     .IsDependentOn("Git-Remove-Commit")
     .Does(() =>
 {
-    var diffFiles = GitDiff(testInitalRepo, removeCommit.Sha);
+    var diffFiles = GitDiff(testInitialRepo, removeCommit.Sha);
     foreach(var diffFile in diffFiles)
     {
         Information("{0}", diffFile);
@@ -346,7 +346,7 @@ Task("Git-Modify-Add")
     .Does(() =>
 {
     Information("Adding modified test files...");
-    GitAdd(testInitalRepo, testModifyFiles);
+    GitAdd(testInitialRepo, testModifyFiles);
 });
 
 Task("Git-Modify-AddAll")
@@ -354,7 +354,7 @@ Task("Git-Modify-AddAll")
     .Does(() =>
 {
     Information("Adding modified test files...");
-    GitAddAll(testInitalRepo);
+    GitAddAll(testInitialRepo);
 });
 
 Task("Git-Modify-Unstage")
@@ -362,16 +362,16 @@ Task("Git-Modify-Unstage")
     .Does(() =>
 {
     Information("Unstaging added test files...");
-    if (!GitHasStagedChanges(testInitalRepo))
+    if (!GitHasStagedChanges(testInitialRepo))
     {
         throw new Exception("Repository doesn't report indexed changes.");
     };
-    GitUnstageAll(testInitalRepo);
-    if (GitHasStagedChanges(testInitalRepo))
+    GitUnstageAll(testInitialRepo);
+    if (GitHasStagedChanges(testInitialRepo))
     {
         throw new Exception("Repository does report indexed changes.");
     };
-    GitAdd(testInitalRepo, testModifyFiles);
+    GitAdd(testInitialRepo, testModifyFiles);
 });
 
 Task("Git-Modify-Commit")
@@ -379,7 +379,7 @@ Task("Git-Modify-Commit")
     .Does(() =>
 {
     Information("Committing modified files...");
-    modifiedCommit = GitCommit(testInitalRepo, testUser, testUserEmail, "Modified commit");
+    modifiedCommit = GitCommit(testInitialRepo, testUser, testUserEmail, "Modified commit");
     Information("Commit created:\r\n{0}", modifiedCommit);
 });
 
@@ -387,7 +387,7 @@ Task("Git-Modify-Diff")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
 {
-    var diffFiles = GitDiff(testInitalRepo, modifiedCommit.Sha);
+    var diffFiles = GitDiff(testInitialRepo, modifiedCommit.Sha);
     foreach(var diffFile in diffFiles)
     {
         Information("{0}", diffFile);
@@ -469,16 +469,16 @@ Task("Git-Find-Root-From-Path")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
 {
-    var deepFolder = testInitalRepo.Combine("test-folder/deep");
+    var deepFolder = testInitialRepo.Combine("test-folder/deep");
     CreateDirectory(deepFolder);
     var rootFolder = GitFindRootFromPath(deepFolder);
     Information("Git root folder found: {0}", rootFolder);
-    if (rootFolder.FullPath != testInitalRepo.FullPath)
-        throw new Exception(string.Format("Wrong git root found (actual: {0}, expected: {1})", rootFolder, testInitalRepo));
+    if (rootFolder.FullPath != testInitialRepo.FullPath)
+        throw new Exception(string.Format("Wrong git root found (actual: {0}, expected: {1})", rootFolder, testInitialRepo));
 });
 
 Task("Git-Find-Root-From-Path-TempDirectory")
-    .Does(() => 
+    .Does(() =>
 {
     var tempPath = System.IO.Path.GetTempPath();
     Information("Attempting to resolve Git root directory from temp directory '{0}'...", tempPath);
@@ -500,35 +500,35 @@ Task("Git-Tag-Apply-Objectish")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
 {
-    GitTag(testInitalRepo, "test-tag-objectish", modifiedCommit.Sha);
+    GitTag(testInitialRepo, "test-tag-objectish", modifiedCommit.Sha);
 });
 
 Task("Git-Annotated-Tag-Apply-Objectish")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
 {
-    GitTag(testInitalRepo, "test-annotated-tag-objectish", modifiedCommit.Sha, testUser, testUserEmail, "Test annotated tag. (objectish)");
+    GitTag(testInitialRepo, "test-annotated-tag-objectish", modifiedCommit.Sha, testUser, testUserEmail, "Test annotated tag. (objectish)");
 });
 
 Task("Git-Tag-Apply")
     .IsDependentOn("Git-Tag-Apply-Objectish")
     .Does(() =>
 {
-    GitTag(testInitalRepo, "test-tag");
+    GitTag(testInitialRepo, "test-tag");
 });
 
 Task("Git-Annotated-Tag-Apply")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
 {
-    GitTag(testInitalRepo, "test-annotated-tag", testUser, testUserEmail, "Test annotated tag.");
+    GitTag(testInitialRepo, "test-annotated-tag", testUser, testUserEmail, "Test annotated tag.");
 });
 
 Task("Git-AllTags")
     .IsDependentOn("Git-Tag")
     .Does(()=>
 {
-    var tags = GitTags(testInitalRepo);
+    var tags = GitTags(testInitialRepo);
     if(tags.Count(t=>t.FriendlyName == "test-tag") < 1)
         throw new Exception("test-tag not found");
     if(tags.Count(t=>t.FriendlyName == "test-tag-objectish") < 1)
@@ -539,7 +539,7 @@ Task("Git-AllTags-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(()=>
 {
-    var tags = GitTags(testInitalRepo);
+    var tags = GitTags(testInitialRepo);
     if(tags.Count(t=>t.FriendlyName == "test-annotated-tag") < 1)
         throw new Exception("test-annotated-tag not found");
     if(tags.Count(t=>t.FriendlyName == "test-annotated-tag-objectish") < 1)
@@ -550,7 +550,7 @@ Task("Git-AllTags-Targets")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tags = GitTags(testInitalRepo, loadTargets: true);
+    var tags = GitTags(testInitialRepo, loadTargets: true);
 
     foreach (var tag in tags)
     {
@@ -564,7 +564,7 @@ Task("Git-Describe-Generic")
     .IsDependentOn("Git-Tag")
     .Does(() =>
 {
-    var tag = GitDescribe(testInitalRepo);
+    var tag = GitDescribe(testInitialRepo);
     Information("Describe returned: [{0}]", tag);
     if (!tag.Contains("test-tag"))
         throw new Exception("Wrong described tag: " + tag);
@@ -574,7 +574,7 @@ Task("Git-Describe-Tags")
     .IsDependentOn("Git-Tag")
     .Does(() =>
 {
-    var tag = GitDescribe(testInitalRepo, GitDescribeStrategy.Tags);
+    var tag = GitDescribe(testInitialRepo, GitDescribeStrategy.Tags);
     Information("Describe returned: [{0}]", tag);
     if (!tag.Contains("test-tag"))
         throw new Exception("Wrong described tag: " + tag);
@@ -584,8 +584,8 @@ Task("Git-Describe-Long")
     .IsDependentOn("Git-Tag")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, true, GitDescribeStrategy.Tags);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, false, GitDescribeStrategy.Tags);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-tag"))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -597,8 +597,8 @@ Task("Git-Describe-Abbrev")
     .IsDependentOn("Git-Tag")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-tag"))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -610,8 +610,8 @@ Task("Git-Describe-Commit")
     .IsDependentOn("Git-Tag")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, modifiedCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, modifiedCommit.Sha, false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-tag"))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -623,8 +623,8 @@ Task("Git-Describe-Commit-NoTag")
     .IsDependentOn("Git-Tag")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, initialCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, initialCommit.Sha, false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!string.IsNullOrEmpty(tagAlwaysLong))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -636,8 +636,8 @@ Task("Git-Describe-Master")
     .IsDependentOn("Git-Tag")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, "master", true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, "master", false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, "master", true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, "master", false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-tag"))
         throw new Exception("Wrong describe");
@@ -649,7 +649,7 @@ Task("Git-Describe-Generic-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tag = GitDescribe(testInitalRepo);
+    var tag = GitDescribe(testInitialRepo);
     Information("Describe returned: [{0}]", tag);
     if (!tag.Contains("test-annotated-tag"))
         throw new Exception("Wrong described tag: " + tag);
@@ -659,7 +659,7 @@ Task("Git-Describe-Tags-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tag = GitDescribe(testInitalRepo, GitDescribeStrategy.Tags);
+    var tag = GitDescribe(testInitialRepo, GitDescribeStrategy.Tags);
     Information("Describe returned: [{0}]", tag);
     if (!tag.Contains("test-annotated-tag"))
         throw new Exception("Wrong described tag: " + tag);
@@ -669,8 +669,8 @@ Task("Git-Describe-Long-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, true, GitDescribeStrategy.Tags);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, false, GitDescribeStrategy.Tags);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -682,8 +682,8 @@ Task("Git-Describe-Abbrev-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -695,8 +695,8 @@ Task("Git-Describe-Commit-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, modifiedCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, modifiedCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, modifiedCommit.Sha, false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -708,8 +708,8 @@ Task("Git-Describe-Commit-NoTag-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, initalCommit.Sha, false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, initialCommit.Sha, true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, initialCommit.Sha, false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!string.IsNullOrEmpty(tagAlwaysLong))
         throw new Exception("Wrong described tagAlwaysLong: " + tagAlwaysLong);
@@ -721,8 +721,8 @@ Task("Git-Describe-Master-Annotated")
     .IsDependentOn("Git-Tag-Annotated")
     .Does(() =>
 {
-    var tagAlwaysLong = GitDescribe(testInitalRepo, "master", true, GitDescribeStrategy.Tags, 16);
-    var tagNotAlwaysLong = GitDescribe(testInitalRepo, "master", false, GitDescribeStrategy.Tags, 16);
+    var tagAlwaysLong = GitDescribe(testInitialRepo, "master", true, GitDescribeStrategy.Tags, 16);
+    var tagNotAlwaysLong = GitDescribe(testInitialRepo, "master", false, GitDescribeStrategy.Tags, 16);
     Information("Describe returned long: [{0}], !long: [{1}]", tagAlwaysLong, tagNotAlwaysLong);
     if (!tagAlwaysLong.StartsWith("test-annotated-tag"))
         throw new Exception("Wrong describe");
@@ -733,7 +733,7 @@ Task("Git-Describe-Master-Annotated")
 Task("Git-Current-Branch")
     .Does(() =>
 {
-    var branch = GitBranchCurrent(testInitalRepo);
+    var branch = GitBranchCurrent(testInitialRepo);
     Information("Current branch: {0}", branch);
 });
 
@@ -741,10 +741,10 @@ Task("Git-Create-Branch-With-Checkout")
 .Does(() =>
 {
     var branchName = "Foo-With-Checkout";
-    var createdBranch = GitCreateBranch(testInitalRepo, branchName, true);
+    var createdBranch = GitCreateBranch(testInitialRepo, branchName, true);
     if (createdBranch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
-    var branch = GitBranchCurrent(testInitalRepo);
+    var branch = GitBranchCurrent(testInitialRepo);
     if (branch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
 });
@@ -753,11 +753,11 @@ Task("Git-Create-Branch-Without-Checkout")
 .Does(() =>
 {
     var branchName = "Foo-Without-Checkout";
-    var createdBranch = GitCreateBranch(testInitalRepo, branchName, false);
+    var createdBranch = GitCreateBranch(testInitialRepo, branchName, false);
     if (createdBranch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch returned. Expected {branchName} and got {createdBranch.FriendlyName}");
-    GitCheckout(testInitalRepo, branchName);
-    var branch = GitBranchCurrent(testInitalRepo);
+    GitCheckout(testInitialRepo, branchName);
+    var branch = GitBranchCurrent(testInitialRepo);
     if (branch.FriendlyName != branchName)
         throw new Exception($"Incorrect Branch created. Expected {branchName} and got {branch.FriendlyName}");
 });
@@ -772,8 +772,8 @@ Task("Git-Remote-Branch")
 Task("Git-Checkout")
     .Does(() =>
 {
-    GitCheckout(testInitalRepo, "master");
-    var branch = GitBranchCurrent(testInitalRepo);
+    GitCheckout(testInitialRepo, "master");
+    var branch = GitBranchCurrent(testInitialRepo);
      if (branch.FriendlyName != "master")
         throw new Exception(string.Format("branch is incorrect. Expected master and got {0}", branch.FriendlyName));
 });
@@ -795,7 +795,7 @@ Task("Git-Reset-Stage-File")
   .Does(() =>
 {
     Information("Staging files...");
-    GitAdd(testInitalRepo, testModifyFiles);
+    GitAdd(testInitialRepo, testModifyFiles);
 });
 
 Task("Git-Reset-Hard")
@@ -803,7 +803,7 @@ Task("Git-Reset-Hard")
   .Does(() =>
 {
     Information("Performing hard reset on files...");
-    GitReset(testInitalRepo, GitResetMode.Hard);
+    GitReset(testInitialRepo, GitResetMode.Hard);
 });
 
 Task("Git-Clean")
@@ -812,12 +812,12 @@ Task("Git-Clean")
 {
     Information("Performing hard reset on files...");
 
-    if (!GitHasUntrackedFiles(testInitalRepo))
+    if (!GitHasUntrackedFiles(testInitialRepo))
         throw new InvalidOperationException("Repo contains no untracked files");
 
-    GitClean(testInitalRepo);
+    GitClean(testInitialRepo);
 
-    if (GitHasUntrackedFiles(testInitalRepo))
+    if (GitHasUntrackedFiles(testInitialRepo))
         throw new InvalidOperationException("Git clean is not working properly");
 });
 
@@ -826,20 +826,20 @@ Task("Git-Log-Tag")
     .IsDependentOn("Git-Describe-Annotated")
     .Does(() =>
 {
-    var filePath = testInitalRepo.CombineWithFilePath(string.Format("{0}.new", Guid.NewGuid()));
+    var filePath = testInitialRepo.CombineWithFilePath(string.Format("{0}.new", Guid.NewGuid()));
     CreateRandomDataFile(Context, filePath);
-    GitAdd(testInitalRepo, filePath);
-    GitCommit(testInitalRepo, testUser, testUserEmail, "Third commit");
+    GitAdd(testInitialRepo, filePath);
+    GitCommit(testInitialRepo, testUser, testUserEmail, "Third commit");
     CreateRandomDataFile(Context, filePath);
-    GitAdd(testInitalRepo, filePath);
-    GitCommit(testInitalRepo, testUser, testUserEmail, "Fourth commit");
+    GitAdd(testInitialRepo, filePath);
+    GitCommit(testInitialRepo, testUser, testUserEmail, "Fourth commit");
     CreateRandomDataFile(Context, filePath);
-    GitAdd(testInitalRepo, filePath);
-    GitCommit(testInitalRepo, testUser, testUserEmail, "Fifth commit");
+    GitAdd(testInitialRepo, filePath);
+    GitCommit(testInitialRepo, testUser, testUserEmail, "Fifth commit");
 
-    var commitsSinceTag = GitLogTag(testInitalRepo, "test-tag");
+    var commitsSinceTag = GitLogTag(testInitialRepo, "test-tag");
 
-    ValidateGitLogTag(commitsSinceTag, "Third commit", "Fourth commit", "Fifth commit"); 
+    ValidateGitLogTag(commitsSinceTag, "Third commit", "Fourth commit", "Fifth commit");
 
     void ValidateGitLogTag(ICollection<GitCommit> commits, params string[] commitMessages)
     {
@@ -861,12 +861,12 @@ Task("Git-Log-Tag")
 Task("Git-Config")
     .Does(() =>
 {
-    GitConfigSetLocal(testInitalRepo, "user.email", "bob@example.com");
-    
-    if (GitConfigExists<string>(testInitalRepo, "user.email"))
+    GitConfigSetLocal(testInitialRepo, "user.email", "bob@example.com");
+
+    if (GitConfigExists<string>(testInitialRepo, "user.email"))
     {
-        string email = GitConfigGet<string>(testInitalRepo, "user.email");
-        
+        string email = GitConfigGet<string>(testInitialRepo, "user.email");
+
         if (!string.Equals("bob@example.com", email))
         {
             throw new InvalidOperationException("Wrong email in configuration.");
@@ -880,25 +880,25 @@ Task("Git-ShortenSha-length")
 {
     // Arrange
     const int min = 20;
-    var commit = GitLogTip(testInitalRepo);
+    var commit = GitLogTip(testInitialRepo);
 
     // Act
-    var shortSha = GitShortenSha(testInitalRepo, commit, min);
+    var shortSha = GitShortenSha(testInitialRepo, commit, min);
 
     Information("Sha      {0}", commit.Sha);
     Information("ShortSha {0}", shortSha);
-    
-    if(shortSha.Length < min) 
+
+    if(shortSha.Length < min)
     {
         throw new InvalidOperationException($"Short SHA is expected to have a minimal length of {min}.");
     }
 
-    if(shortSha.Length >= commit.Sha.Length) 
+    if(shortSha.Length >= commit.Sha.Length)
     {
         throw new InvalidOperationException("Short SHA is expected to be shorter.");
     }
 
-    if(!commit.Sha.StartsWith(shortSha)) 
+    if(!commit.Sha.StartsWith(shortSha))
     {
         throw new InvalidOperationException("Short SHA is expected to match the start of the full SHA.");
     }
@@ -909,19 +909,19 @@ Task("Git-ShortenSha-no-length")
     .Does(() =>
 {
     // Arrange
-    var commit = GitLogTip(testInitalRepo);
+    var commit = GitLogTip(testInitialRepo);
 
     // Act
-    var shortSha = GitShortenSha(testInitalRepo, commit);
+    var shortSha = GitShortenSha(testInitialRepo, commit);
 
     Information("Sha      {0}", commit.Sha);
     Information("ShortSha {0}", shortSha);
-    if(shortSha.Length >= commit.Sha.Length) 
+    if(shortSha.Length >= commit.Sha.Length)
     {
         throw new InvalidOperationException("Short SHA is expected to be shorter.");
     }
 
-    if(!commit.Sha.StartsWith(shortSha)) 
+    if(!commit.Sha.StartsWith(shortSha))
     {
         throw new InvalidOperationException("Short SHA is expected to match the start of the full SHA.");
     }
@@ -937,7 +937,7 @@ Task("Git-Fetch-Remote-Base")
     try
     {
         // Arrange: create a repo and a clone, then add a commit in "origin"
-        GitClone((IsRunningOnWindows() ? "" : "file://") + testInitalRepo.FullPath, originDir);
+        GitClone((IsRunningOnWindows() ? "" : "file://") + testInitialRepo.FullPath, originDir);
         GitClone((IsRunningOnWindows() ? "" : "file://") + originDir.FullPath, testDir);
 
         // Arrange: Add a commit in origin
@@ -952,10 +952,10 @@ Task("Git-Fetch-Remote-Base")
 
         // Assert
         try
-        { 
+        {
             var fetched = GitLogLookup(testDir, commit.Sha);
             Information("Commit found after fetch: {0}", fetched.Sha);
-        } 
+        }
         catch(ArgumentNullException)
         {
             Error("expected commit not found after fetch.");
@@ -984,10 +984,10 @@ Task("Git-Fetch-Remote-Tags")
     try
     {
         // Arrange: create a repo and a clone, then add a commit and a tag in "origin"
-        GitClone((IsRunningOnWindows() ? "" : "file://")+testInitalRepo.FullPath, originDir);
+        GitClone((IsRunningOnWindows() ? "" : "file://")+testInitialRepo.FullPath, originDir);
         GitClone((IsRunningOnWindows() ? "" : "file://")+originDir.FullPath, testDir);
 
-        // Arrange: Add a branch, commit and tag in origin and place it "before" our current commit. 
+        // Arrange: Add a branch, commit and tag in origin and place it "before" our current commit.
         var someOldCommit = GitLog(originDir, 10).Last();
         GitCheckout(originDir, someOldCommit.Sha);
         var newBranch = GitCreateBranch(originDir, Guid.NewGuid().ToString("d"), true);
@@ -1184,10 +1184,10 @@ public static void CreateRandomDataFile(ICakeContext context, FilePath filePath)
 {
     var file = context.FileSystem.GetFile(filePath);
 
-    using (var rngCsp = new RNGCryptoServiceProvider())
+    using (var rng = RandomNumberGenerator.Create())
     {
         var data = new byte[128];
-        rngCsp.GetBytes(data);
+        rng.GetBytes(data);
         var base64Data = Convert.ToBase64String(data, Base64FormattingOptions.InsertLineBreaks);
         using(var stream = file.OpenWrite())
         {
