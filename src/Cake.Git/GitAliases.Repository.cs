@@ -193,12 +193,42 @@ namespace Cake.Git
             {
                 if (Repository.IsValid(fsPath.FullPath))
                     return fsPath;
-                var parentDir = fsPath.Combine("../").Collapse();
-                if (!context.FileSystem.Exist(parentDir))
+                var parentDir = GetParent(context, fsPath);
+                if (!context.FileSystem.Exist(parentDir) || GetParent(context, parentDir) == null)
                     throw new RepositoryNotFoundException($"Path '{path}' doesn't point at a valid Git repository or workdir.");
                 fsPath = parentDir;
             }
             while (true);
+        }
+        
+        // replace with DirectoryPath.GetParent(), once https://github.com/cake-build/cake/pull/3349/files
+        // ReSharper disable once InconsistentNaming
+        private static DirectoryPath GetParent(ICakeContext context, DirectoryPath path)
+        {
+            path = path.MakeAbsolute(context.Environment); // to be sure. It's no use splitting the segments of "."
+
+            if (path.Segments.Length == 1)
+            {
+                // one segment on Windows is e.g. "C:/" 
+                // on all other systems one segment is e.g "/home"
+                if (context.Environment.Platform.Family == PlatformFamily.Windows) 
+                {
+                    // no more parents
+                    return null;
+                }
+
+                // root ("/") is not really a segment for Cake, 
+                // so we return that directly.
+                return new DirectoryPath("/");
+            }
+            
+            if(path.Segments.Length == 0) 
+            {
+                return null;
+            }
+
+            var segments = path.Segments.Take(path.Segments.Length - 1);
+            return new DirectoryPath(string.Join(path.Separator.ToString(), segments));
         }
     }
 }

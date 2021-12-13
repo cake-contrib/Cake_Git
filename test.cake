@@ -477,6 +477,25 @@ Task("Git-Find-Root-From-Path")
         throw new Exception(string.Format("Wrong git root found (actual: {0}, expected: {1})", rootFolder, testInitalRepo));
 });
 
+Task("Git-Find-Root-From-Path-TempDirectory")
+    .Does(() => 
+{
+    var tempPath = System.IO.Path.GetTempPath();
+    Information("Attempting to resolve Git root directory from temp directory '{0}'...", tempPath);
+    try
+    {
+        var result = GitFindRootFromPath(tempPath);
+        throw new Exception(string.Format("Path at '{0}' should not be a valid Git repository.  Found Git root at '{1}'.",
+            tempPath, result.FullPath));
+    }
+    catch(LibGit2Sharp.RepositoryNotFoundException)
+    {
+        // this exception is expected when the directory traversal
+        // does not successfully identify a git repository.
+        Information("No repository located.  This is expected.");
+    }
+});
+
 Task("Git-Tag-Apply-Objectish")
     .IsDependentOn("Git-Modify-Commit")
     .Does(() =>
@@ -1086,6 +1105,7 @@ Task("Default-Tests")
     .IsDependentOn("Git-Clone-WithCredentialsAndSettings")
     .IsDependentOn("Git-Diff")
     .IsDependentOn("Git-Find-Root-From-Path")
+    .IsDependentOn("Git-Find-Root-From-Path-TempDirectory")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
@@ -1125,6 +1145,7 @@ Task("Local-Tests")
     .IsDependentOn("Git-Modify-Diff")
     .IsDependentOn("Git-Diff")
     .IsDependentOn("Git-Find-Root-From-Path")
+    .IsDependentOn("Git-Find-Root-From-Path-TempDirectory")
     .IsDependentOn("Git-Reset")
     .IsDependentOn("Git-Describe")
     .IsDependentOn("Git-Describe-Annotated")
