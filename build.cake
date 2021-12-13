@@ -23,6 +23,7 @@ if (BuildSystem.GitHubActions.IsRunningOnGitHubActions)
 
 Setup(ctx =>
 {
+    var isMainBranch        = StringComparer.OrdinalIgnoreCase.Equals("master", AppVeyor.Environment.Repository.Branch);
     var isLocalBuild        = !AppVeyor.IsRunningOnAppVeyor;
     var releaseNotes        = ParseReleaseNotes("./ReleaseNotes.md");
     var version             = releaseNotes.Version.ToString();
@@ -30,6 +31,11 @@ Setup(ctx =>
                                                 && !string.IsNullOrWhiteSpace(AppVeyor.Environment.Repository.Tag.Name))
                                     ? version
                                     : string.Concat(version, "-build-", AppVeyor.Environment.Build.Number.ToString("0000"));
+
+    var shouldPublish       = ctx.IsRunningOnWindows()
+                                && AppVeyor.IsRunningOnAppVeyor
+                                && AppVeyor.Environment.Repository.Tag.IsTag
+                                && StringComparer.OrdinalIgnoreCase.Equals(version, AppVeyor.Environment.Repository.Tag.Name?.TrimStart('v'));
 
     if (!isLocalBuild)
     {
@@ -53,16 +59,20 @@ Setup(ctx =>
 
 
     // Executed BEFORE the first task.
-    Information("Building {0} version {1} of {2} ({3}).",
+    Information("Building {0} version {1} of {2} ({3}), IsMainBranch: {4}, Publish: {5}.",
                 configuration,
                 version,
                 assemblyInfo.Product,
-                semVersion);
+                semVersion,
+                isMainBranch,
+                shouldPublish);
 
     var artifactsRoot = MakeAbsolute(Directory("./artifacts/"));
     var nugetRoot     = MakeAbsolute(Directory("./nuget/"));
 
     return new BuildData(
+        isMainBranch,
+        shouldPublish,
         isLocalBuild,
         configuration,
         target,
@@ -285,6 +295,21 @@ Task("Upload-AppVeyor-Artifacts")
     AppVeyor.UploadArtifact(data.BuildPaths.Package);
 });
 
+Task("Push-NuGet-Packages")
+    .IsDependentOn("Create-NuGet-Package")
+    .IsDependentOn("Test")
+    .WithCriteria<BuildData>(static data => data.ShouldPushNuGetPackages())
+    .Does<BuildData>((context, data) =>
+{
+   context.DotNetNuGetPush(
+                data.BuildPaths.Package,
+                new DotNetNuGetPushSettings
+                {
+                    Source = data.NuGetSource,
+                    ApiKey = data.NuGetApiKey
+                }
+        );
+});
 
 Task("Upload-GitHubActions-Artifacts")
     .IsDependentOn("Create-NuGet-Package")
@@ -310,7 +335,8 @@ Task("Local-Tests")
     .IsDependentOn("Test");
 
 Task("AppVeyor")
-    .IsDependentOn("Upload-AppVeyor-Artifacts");
+    .IsDependentOn("Upload-AppVeyor-Artifacts")
+    .IsDependentOn("Push-NuGet-Packages");
 
 Task("GitHubActions")
     .IsDependentOn("Upload-GitHubActions-Artifacts");
@@ -339,6 +365,8 @@ public record BuildPaths(
 }
 
 public record BuildData(
+    bool IsMainBranch,
+    bool ShouldPublish,
     bool IsLocalBuild,
     string Configuration,
     string Target,
@@ -346,7 +374,15 @@ public record BuildData(
     DotNetMSBuildSettings MSBuildSettings,
     NuGetPackSettings NuGetPackSettings,
     AssemblyInfoSettings AssemblyInfoSettings,
-    BuildPaths BuildPaths);
+    BuildPaths BuildPaths)
+{
+    public string NuGetSource { get; } = System.Environment.GetEnvironmentVariable("NUGET_SOURCE");
+    public string NuGetApiKey { get; } = System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
+    public bool ShouldPushNuGetPackages() =>    IsMainBranch &&
+                                                ShouldPublish &&
+                                                !string.IsNullOrWhiteSpace(NuGetSource) &&
+                                                !string.IsNullOrWhiteSpace(NuGetApiKey);
+}
 
 public record TestCase(
     string TargetFramework,
