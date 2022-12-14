@@ -1,3 +1,7 @@
+### New in 3.0.0 (Released 2022/12/14)
+
+* Update Cake.Git to target Cake.Core 3.0.0 and net7.0 TFM
+
 ### New in 2.0.0 (Released 2021/12/13)
 
 * Update Cake.Git to target Cake v2.0.0
