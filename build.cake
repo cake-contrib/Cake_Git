@@ -76,7 +76,7 @@ Setup(ctx =>
         isLocalBuild,
         configuration,
         target,
-        new[]{ "netcoreapp3.1", "net5.0", "net6.0" },
+        new[]{ "net6.0", "net7.0" },
         new DotNetMSBuildSettings()
                             .WithProperty("Version", semVersion)
                             .WithProperty("AssemblyVersion", version)
@@ -377,7 +377,7 @@ public record BuildData(
     BuildPaths BuildPaths)
 {
     public string NuGetSource { get; } = System.Environment.GetEnvironmentVariable("NUGET_SOURCE");
-    public string NuGetApiKey { get; } = System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
+    public string NuGetApiKey { get; } = System.Environment.GetEnvironmentVariable("NUGET_API_KEY");
     public bool ShouldPushNuGetPackages() =>    IsMainBranch &&
                                                 ShouldPublish &&
                                                 !string.IsNullOrWhiteSpace(NuGetSource) &&
