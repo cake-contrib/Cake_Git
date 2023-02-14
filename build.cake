@@ -215,24 +215,18 @@ Task("Create-NuGet-Package")
 {
     var cakeGit = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/Cake.Git.dll");
     var cakeGitDoc = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/Cake.Git.xml");
-    var libGit = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/LibGit2Sharp*");
+    var libGitSharp = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/LibGit2Sharp*");
+    // cake scripting needs the unmanaged dlls to be in the "wrong" place for some reason..
+    var libGit = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/runtimes/**/*");
     var unmanaged = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/net6.0/runtimes/**/*");
 
-    data.NuGetPackSettings.Files =  (libGit + cakeGit + cakeGitDoc)
+    data.NuGetPackSettings.Files =  (libGitSharp + libGit + cakeGit + cakeGitDoc)
                                     .Select(file=>file.FullPath.Substring(data.BuildPaths.ArtifactsRoot.FullPath.Length+1))
                                     .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
                                     // add unmanaged dlls to the "right" place in the nuget
                                     .Union(unmanaged
                                         .Select(file=>file.FullPath.Substring(data.BuildPaths.ArtifactsRoot.FullPath.Length+1))
                                         .Select(file=>new NuSpecContent {Source = file, Target = "/" + file.Substring(7)}))
-                                    // cake scripting needs the unmanaged dlls to be in the "wrong" place for some reason..
-                                    .Union(unmanaged
-                                        .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
-                                        .SelectMany(file => data.TargetFrameworks.Select(tfm =>
-                                            new NuSpecContent {
-                                                Source = file.FullPath.Substring(data.BuildPaths.ArtifactsRoot.FullPath.Length+1),
-                                                Target = $"lib/{tfm}/{file.GetFilename()}"
-                                            })))
                                     // add the icon
                                     .Union(new []
                                     {
