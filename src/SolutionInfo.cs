@@ -14,5 +14,5 @@ using System;
 [assembly: AssemblyFileVersion("2.0.0")]
 [assembly: AssemblyInformationalVersion("2.0.0")]
 [assembly: AssemblyCopyright("Copyright © WCOM AB 2022")]
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 

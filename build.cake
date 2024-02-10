@@ -51,7 +51,7 @@ Setup(ctx =>
                                 FileVersion             = version,
                                 InformationalVersion    = semVersion,
                                 Copyright               = string.Format("Copyright © WCOM AB {0}", DateTime.Now.Year),
-                                CLSCompliant            = true
+                                CLSCompliant            = false
                             };
 
 
