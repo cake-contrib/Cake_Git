@@ -21,7 +21,7 @@
     <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0102" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.312" />
     <PackageReference Include="Cake.Core" Version="4.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs" Link="Properties\SolutionInfo.cs" />
