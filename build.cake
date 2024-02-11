@@ -51,7 +51,7 @@ Setup(ctx =>
                                 FileVersion             = version,
                                 InformationalVersion    = semVersion,
                                 Copyright               = string.Format("Copyright © WCOM AB {0}", DateTime.Now.Year),
-                                CLSCompliant            = true
+                                CLSCompliant            = false
                             };
 
 
@@ -227,7 +227,7 @@ Task("Create-NuGet-Package")
                                         .Select(file=>new NuSpecContent {Source = file, Target = "/" + file.Substring(7)}))
                                     // cake scripting needs the unmanaged dlls to be in the "wrong" place for some reason..
                                     .Union(unmanaged
-                                        .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
+                                        .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx-x64/"))
                                         .SelectMany(file => data.TargetFrameworks.Select(tfm =>
                                             new NuSpecContent {
                                                 Source = file.FullPath.Substring(data.BuildPaths.ArtifactsRoot.FullPath.Length+1),

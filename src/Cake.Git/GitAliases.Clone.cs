@@ -189,11 +189,9 @@ namespace Cake.Git
 
             context.FileSystem.GetDirectory(workFullDirectoryPath).Create();
 
-            var options = new CloneOptions
-            {
-                CredentialsProvider =
-                    (url, user, cred) => new UsernamePasswordCredentials { Username = username, Password = password }
-            };
+            var options = new CloneOptions();
+            options.FetchOptions.CredentialsProvider =
+                (url, user, cred) => new UsernamePasswordCredentials { Username = username, Password = password };
 
             return Repository.Clone(sourceUrl, workFullDirectoryPath.FullPath, options);
         }
@@ -265,7 +263,7 @@ namespace Cake.Git
             context.FileSystem.GetDirectory(workFullDirectoryPath).Create();
 
             var options = cloneSettings.ToCloneOptions();
-            options.CredentialsProvider =
+            options.FetchOptions.CredentialsProvider =
                 (url, user, cred) => new UsernamePasswordCredentials { Username = username, Password = password };
 
             return Repository.Clone(sourceUrl, workFullDirectoryPath.FullPath, options);
