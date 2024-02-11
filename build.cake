@@ -44,7 +44,7 @@ Setup(ctx =>
 
     var assemblyInfo        = new AssemblyInfoSettings {
                                 Title                   = "Cake.Git",
-                                Description             = "Cake Git AddIn",
+                                Description             = "This addin provides aliases for running Git commands from Cake scripts. It is a thin wrapper around the LibGit2Sharp library and provides a way to interact with Git repositories from Cake scripts.",
                                 Product                 = "Cake.Git",
                                 Company                 = "WCOM AB",
                                 Version                 = version,
@@ -90,7 +90,11 @@ Setup(ctx =>
                                 Title                   = assemblyInfo.Title,
                                 Authors                 = new[] {assemblyInfo.Company},
                                 Owners                  = new[] {assemblyInfo.Company, "cake-contrib"},
-                                Description             = assemblyInfo.Description,
+                                Description             = assemblyInfo.Description + 
+                                                          Environment.NewLine + Environment.NewLine + 
+                                                          "NOTE:" + 
+                                                          Environment.NewLine + 
+                                                          "The addin currently only runs on x64 processors. ARM processors are not supported.",
                                 Summary                 = "Cake AddIn that extends Cake with Git SCM features",
                                 ProjectUrl              = new Uri("https://github.com/cake-contrib/Cake_Git/"),
                                 Repository              = new NuGetRepository { Type = "git", Url = "https://github.com/cake-contrib/Cake_Git.git" },
