@@ -27,9 +27,10 @@ jobs:
             include-prerelease: 'true'
 
       - name: Run Cake script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v2
         env:
           matrix-os: ${{ matrix.os }}
         with:
           target: GitHubActions
           cake-version: tool-manifest
+          verbosity: Diagnostic
