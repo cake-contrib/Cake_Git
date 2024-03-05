@@ -31,17 +31,14 @@ namespace Cake.Git
             {
                 throw new ArgumentNullException(nameof(context));
             }
-context.Log.Warning("Calculating the Cake.Git packaged libGit2 dlls path");
+
             var dllPath = typeof(GitAliases).Assembly.Location;
-context.Log.Warning("dllPath is {0}", dllPath);
-            var runtimesDir =
+            var runtimesDir = 
                 new FilePath(dllPath) // the dll
                 .GetDirectory() // the tfm folder
                 .GetParent() // the "lib" folder
                 .GetParent() // root of the package
                 .Combine("runtimes");
-context.Log.Warning("runtimesDir is {0}", runtimesDir);
-
 
             var os = context.Environment.Platform.Family switch
             {
@@ -49,22 +46,18 @@ context.Log.Warning("runtimesDir is {0}", runtimesDir);
                 PlatformFamily.OSX => "osx",
                 _ => "linux"
             };
-context.Log.Warning("OS is {0}", os);
-
-
+            
             var processorArchitecture = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
-context.Log.Warning("processorArchitecture is {0}", processorArchitecture);
             var rid = $"{os}-{processorArchitecture}";
-context.Log.Warning("rid is {0}", rid);
             var nativeDllPath = runtimesDir.Combine(rid).Combine("native");
             context.Log.Verbose("Calculated the Cake.Git packaged libGit2 dlls to be in {0}", nativeDllPath);
-context.Log.Warning("Calculated the Cake.Git packaged libGit2 dlls to be in {0}", nativeDllPath);
+
             if (!context.FileSystem.GetDirectory(nativeDllPath).Exists)
             {
                 throw new CakeException(
                     $"Could not set libGit2 NativeLibraryPath: No libGit2 library was packed for runtime-ID '{rid}'.");
             }
-
+            
             GlobalSettings.NativeLibraryPath = nativeDllPath.FullPath;
         }
 
@@ -85,7 +78,7 @@ context.Log.Warning("Calculated the Cake.Git packaged libGit2 dlls to be in {0}"
                     {
                         return;
                     }
-
+                    
                     var cakeLogLevel = level switch
                     {
                         LogLevel.Trace => Cake.Core.Diagnostics.LogLevel.Debug,
@@ -96,7 +89,7 @@ context.Log.Warning("Calculated the Cake.Git packaged libGit2 dlls to be in {0}"
                         LogLevel.Fatal => Cake.Core.Diagnostics.LogLevel.Fatal,
                         _ => Core.Diagnostics.LogLevel.Debug
                     };
-
+                    
                     context.Log.Write(Verbosity.Normal, cakeLogLevel, "LibGit2Sharp: {0}", txt);
                 });
         }
