@@ -8,9 +8,6 @@ using LibGit2Sharp;
 
 namespace Cake.Git
 {
-    /// <summary>
-    /// Class GitAliases.
-    /// </summary>
     public static partial class GitAliases
     {
         /// <summary>

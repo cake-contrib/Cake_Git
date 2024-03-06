@@ -44,14 +44,14 @@ Setup(ctx =>
 
     var assemblyInfo        = new AssemblyInfoSettings {
                                 Title                   = "Cake.Git",
-                                Description             = "Cake Git AddIn",
+                                Description             = "This addin provides aliases for running Git commands from Cake scripts. It is a thin wrapper around the LibGit2Sharp library and provides a way to interact with Git repositories from Cake scripts.",
                                 Product                 = "Cake.Git",
                                 Company                 = "WCOM AB",
                                 Version                 = version,
                                 FileVersion             = version,
                                 InformationalVersion    = semVersion,
                                 Copyright               = string.Format("Copyright © WCOM AB {0}", DateTime.Now.Year),
-                                CLSCompliant            = true
+                                CLSCompliant            = false
                             };
 
 
@@ -76,7 +76,7 @@ Setup(ctx =>
         isLocalBuild,
         configuration,
         target,
-        new[]{ "net6.0", "net7.0" },
+        new[]{ "net6.0", "net7.0", "net8.0" },
         new DotNetMSBuildSettings()
                             .WithProperty("Version", semVersion)
                             .WithProperty("AssemblyVersion", version)
@@ -112,6 +112,7 @@ Setup(ctx =>
             artifactsRoot,
             nugetRoot,
             nugetRoot.CombineWithFilePath("Cake.Git." + semVersion + ".nupkg"),
+            nugetRoot.CombineWithFilePath("Cake.Frosting.Git." + semVersion + ".nupkg"),
             GetFiles("./**/*.sln")
                 .ToArray(),
             MakeAbsolute(Directory("./tools/Addins/Cake.Git/Cake.Git"))));
@@ -210,6 +211,10 @@ Task("Publish-Artifacts")
 
 
 Task("Create-NuGet-Package")
+    .IsDependentOn("Create-NuGet-Package-Scripting")
+    .IsDependentOn("Create-NuGet-Package-Frosting");
+    
+Task("Create-NuGet-Package-Scripting")
     .IsDependentOn("Publish-Artifacts")
     .Does<BuildData>(static (context, data) =>
 {
@@ -218,6 +223,11 @@ Task("Create-NuGet-Package")
     var libGit = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/LibGit2Sharp*");
     var unmanaged = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/net6.0/runtimes/**/*");
 
+    data.NuGetPackSettings.Description += Environment.NewLine + Environment.NewLine + 
+                                          "NOTE:" + Environment.NewLine + 
+                                          "The addin currently only runs on x64 processors. ARM processors are not supported." + Environment.NewLine +
+                                          "This is the version of the addin compatible with Cake Script Runners." + Environment.NewLine +
+                                          "For addin compatible with Cake Frosting see Cake.Frosting.Git.";
     data.NuGetPackSettings.Files =  (libGit + cakeGit + cakeGitDoc)
                                     .Select(file=>file.FullPath.Substring(data.BuildPaths.ArtifactsRoot.FullPath.Length+1))
                                     .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
@@ -227,7 +237,7 @@ Task("Create-NuGet-Package")
                                         .Select(file=>new NuSpecContent {Source = file, Target = "/" + file.Substring(7)}))
                                     // cake scripting needs the unmanaged dlls to be in the "wrong" place for some reason..
                                     .Union(unmanaged
-                                        .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx/"))
+                                        .Where(file=>file.FullPath.Contains("/linux-x64/") || file.FullPath.Contains("/win-x64/") || file.FullPath.Contains("/osx-x64/"))
                                         .SelectMany(file => data.TargetFrameworks.Select(tfm =>
                                             new NuSpecContent {
                                                 Source = file.FullPath.Substring(data.BuildPaths.ArtifactsRoot.FullPath.Length+1),
@@ -249,8 +259,44 @@ Task("Create-NuGet-Package")
     context.NuGetPack(data.NuGetPackSettings);
 });
 
+Task("Create-NuGet-Package-Frosting")
+    .IsDependentOn("Publish-Artifacts")
+    .Does<BuildData>(static (context, data) =>
+{
+    var cakeGit = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/Cake.Git.dll");
+    var cakeGitDoc = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/Cake.Git.xml");
+
+    data.NuGetPackSettings.Id = "Cake.Frosting.Git";
+    data.NuGetPackSettings.Description += Environment.NewLine + Environment.NewLine + 
+                                          "NOTE:" + Environment.NewLine + 
+                                          "This is the version of the addin compatible with Cake Frosting." + Environment.NewLine +
+                                          "For addin compatible with Cake Script Runners see Cake.Git." + Environment.NewLine;
+    data.NuGetPackSettings.Files =  (cakeGit + cakeGitDoc)
+                                    .Select(file=>file.FullPath.Substring(data.BuildPaths.ArtifactsRoot.FullPath.Length+1))
+                                    .Select(file=>new NuSpecContent {Source = file, Target = "lib/" + file})
+                                    // add the icon
+                                    .Union(new []
+                                    {
+                                        new NuSpecContent
+                                        {
+                                            Source = context.MakeAbsolute(context.File("./asset/cake-contrib-addin-medium.png")).FullPath,
+                                            Target = "images/icon.png",
+                                        },
+                                    })
+                                    .ToArray();
+    data.NuGetPackSettings.Dependencies = new List<NuSpecDependency>
+    {
+        new NuSpecDependency { Id = "Cake.Core", Version = "4.0.0" },
+        new NuSpecDependency { Id = "LibGit2Sharp", Version = "0.29.0" }
+    };
+
+    context.EnsureDirectoryExists(data.BuildPaths.NuGetRoot);
+
+    context.NuGetPack(data.NuGetPackSettings);
+});
+
 Task("Test")
-    .IsDependentOn("Create-NuGet-Package")
+    .IsDependentOn("Create-NuGet-Package-Scripting")
     .WithCriteria<BuildData>(data => StringComparer.OrdinalIgnoreCase.Equals(data.Configuration, "Release"))
     .DoesForEach<BuildData, TestCase>(
         static (data, context) => {
@@ -262,7 +308,7 @@ Task("Test")
                 });
             }
 
-            context.Unzip(data.BuildPaths.Package, data.BuildPaths.AddinDir);
+            context.Unzip(data.BuildPaths.ScriptingPackage, data.BuildPaths.AddinDir);
 
             var cakeSettings = new CakeSettings {
                 Arguments = new Dictionary<string, string> {
@@ -292,7 +338,8 @@ Task("Upload-AppVeyor-Artifacts")
     .Does<BuildData>(data =>
 {
     // Upload Artifact
-    AppVeyor.UploadArtifact(data.BuildPaths.Package);
+    AppVeyor.UploadArtifact(data.BuildPaths.ScriptingPackage);
+    AppVeyor.UploadArtifact(data.BuildPaths.FrostingPackage);
 });
 
 Task("Push-NuGet-Packages")
@@ -302,7 +349,15 @@ Task("Push-NuGet-Packages")
     .Does<BuildData>((context, data) =>
 {
    context.DotNetNuGetPush(
-                data.BuildPaths.Package,
+                data.BuildPaths.ScriptingPackage,
+                new DotNetNuGetPushSettings
+                {
+                    Source = data.NuGetSource,
+                    ApiKey = data.NuGetApiKey
+                }
+        );
+   context.DotNetNuGetPush(
+                data.BuildPaths.FrostingPackage,
                 new DotNetNuGetPushSettings
                 {
                     Source = data.NuGetSource,
@@ -321,7 +376,8 @@ Task("Upload-GitHubActions-Artifacts")
     var suffix = EnvironmentVariable("matrix-os")
         ?? GitHubActions.Environment.Runner.OS;
     Information("Uploading artifacts for {0}...", suffix);
-    await GitHubActions.Commands.UploadArtifact(data.BuildPaths.Package, string.Concat("NuGet-", suffix));
+    await GitHubActions.Commands.UploadArtifact(data.BuildPaths.ScriptingPackage, string.Concat("Scripting-NuGet-", suffix));
+    await GitHubActions.Commands.UploadArtifact(data.BuildPaths.FrostingPackage, string.Concat("Frosting-NuGet-", suffix));
     await GitHubActions.Commands.UploadArtifact(data.BuildPaths.ArtifactsRoot, string.Concat("Artifacts-", suffix));
 });
 
@@ -355,7 +411,8 @@ RunTarget(target);
 public record BuildPaths(
     DirectoryPath ArtifactsRoot,
     DirectoryPath NuGetRoot,
-    FilePath Package,
+    FilePath ScriptingPackage,
+    FilePath FrostingPackage,
     ICollection<FilePath> Solutions,
     DirectoryPath AddinDir)
 {
