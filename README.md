@@ -4,10 +4,10 @@
 
 Cake AddIn that extends Cake with Git features using LibGit2 and LibGit2Sharp.
 
-| Build server                | Platform     | Status                                                                                                                    |
-|-----------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------|
-| AppVeyor                    | Windows      | [![Build status](https://ci.appveyor.com/api/projects/status/mycuknigvm2418ht/branch/develop?svg=true)](https://ci.appveyor.com/project/cakecontrib/cake-git/branch/develop) |
-| Travis                      | Linux / OS X | [![Build Status](https://travis-ci.org/cake-contrib/Cake_Git.svg?branch=develop)](https://travis-ci.org/cake-contrib/Cake_Git) |
+| Build server                | Platform                | Status                                                                                                                                                                       |
+|-----------------------------|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| AppVeyor                    | Windows                 | [![Build status](https://ci.appveyor.com/api/projects/status/mycuknigvm2418ht/branch/develop?svg=true)](https://ci.appveyor.com/project/cakecontrib/cake-git/branch/develop) |
+| GitHub Actions              | Windows / Linux / macOS | [![Build status](https://github.com/cake-contrib/Cake_Git/actions/workflows/build.yml/badge.svg)](https://github.com/cake-contrib/Cake_Git/actions/workflows/build.yml)      |
 
 ## Documentation
 
