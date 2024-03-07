@@ -44,6 +44,9 @@ Setup(ctx =>
                             );
 
     Information(buildStartMessage);
+
+    GitSetLibGit2NativeLibraryPathToIncluded();
+    GitEnableLogging();
 });
 
 Teardown(ctx =>
