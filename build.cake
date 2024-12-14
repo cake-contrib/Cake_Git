@@ -286,8 +286,8 @@ Task("Create-NuGet-Package-Frosting")
                                     .ToArray();
     data.NuGetPackSettings.Dependencies = new List<NuSpecDependency>
     {
-        new NuSpecDependency { Id = "Cake.Core", Version = "4.0.0" },
-        new NuSpecDependency { Id = "LibGit2Sharp", Version = "0.29.0" }
+        new NuSpecDependency { Id = "Cake.Core", Version = "5.0.0" },
+        new NuSpecDependency { Id = "LibGit2Sharp", Version = "0.30.0" }
     };
 
     context.EnsureDirectoryExists(data.BuildPaths.NuGetRoot);
