@@ -1025,6 +1025,68 @@ Task("Git-Fetch-Remote-Tags")
     }
 });
 
+Task("Git-Remotes")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    var originDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
+    var testDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
+
+    try
+    {
+        // Arrange: create a repo and a clone
+        GitClone((IsRunningOnWindows() ? "" : "file://")+testInitialRepo.FullPath, originDir);
+        GitClone((IsRunningOnWindows() ? "" : "file://")+originDir.FullPath, testDir);
+
+        // Act
+        var remotes = GitRemotes(testDir);
+
+        // Assert
+        Information("Found remotes: {0}", string.Join(", ", remotes.Select(x => x.Name + " -> " + x.Url)));
+    }
+    finally
+    {
+        // cleanup
+        var settings = new DeleteDirectorySettings {
+            Recursive = true,
+            Force = true
+        };
+        DeleteDirectory(originDir, settings);
+        DeleteDirectory(testDir, settings);
+    }
+});
+
+Task("Git-Remote")
+    .IsDependentOn("Git-Modify-Commit")
+    .Does(() =>
+{
+    var originDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
+    var testDir = testRepo.Combine(Guid.NewGuid().ToString("d"));
+
+    try
+    {
+        // Arrange: create a repo and a clone
+        GitClone((IsRunningOnWindows() ? "" : "file://")+testInitialRepo.FullPath, originDir);
+        GitClone((IsRunningOnWindows() ? "" : "file://")+originDir.FullPath, testDir);
+
+        // Act
+        var remote = GitRemote(testDir, "origin");
+
+        // Assert
+        Information("Found remote: {0}", remote.Url);
+    }
+    finally
+    {
+        // cleanup
+        var settings = new DeleteDirectorySettings {
+            Recursive = true,
+            Force = true
+        };
+        DeleteDirectory(originDir, settings);
+        DeleteDirectory(testDir, settings);
+    }
+});
+
 Task("Git-Tag")
     .IsDependentOn("Git-Tag-Apply")
     .IsDependentOn("Git-Tag-Apply-Objectish");
@@ -1120,7 +1182,9 @@ Task("Default-Tests")
     .IsDependentOn("Git-Clean")
     .IsDependentOn("Git-Config")
     .IsDependentOn("Git-ShortenSha")
-    .IsDependentOn("Git-Fetch-Remote");
+    .IsDependentOn("Git-Fetch-Remote")
+    .IsDependentOn("Git-Remotes")
+    .IsDependentOn("Git-Remote");
 
 Task("Local-Tests")
     .IsDependentOn("Git-Init")
@@ -1160,7 +1224,9 @@ Task("Local-Tests")
     .IsDependentOn("Git-Clean")
     .IsDependentOn("Git-Config")
     .IsDependentOn("Git-ShortenSha")
-    .IsDependentOn("Git-Fetch-Remote");
+    .IsDependentOn("Git-Fetch-Remote")
+    .IsDependentOn("Git-Remotes")
+    .IsDependentOn("Git-Remote");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
