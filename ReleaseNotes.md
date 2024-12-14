@@ -1,9 +1,17 @@
-### New in 4.0.0 (Released 2024/03/06)
+### New in 5.0.0 (Released 2024/12/14)
 
-* Update to Cake 4.0
-* Multi-Target .NET 6, 7 & 8
-* Update to LibGit2Sharp 0.29.0
-* Introduce Cake.Frosting.Git addin for using with Cake Frosting
+* Update to Cake 5.0 (@pascalberger)
+* Multi-Target .NET 8 & 9 (@pascalberger)
+* Update to LibGit2Sharp 0.30.0 (@pascalberger)
+* Add GitRemotes() and GitRemote() aliases (@ap0llo)
+
+### New in 4.0.0 (Released 2024/03/07)
+
+* Update to Cake 4.0 (@pascalberger)
+* Multi-Target .NET 6, 7 & 8 (@pascalberger)
+* Update to LibGit2Sharp 0.29.0 (@pascalberger)
+* Introduce Cake.Frosting.Git addin for using with Cake Frosting (@pascalberger)
+* Document steps to release new versions of Cake.Git (@augustoproiete)
 
 ### New in 3.0.0 (Released 2022/12/14)
 
