@@ -1,3 +1,10 @@
+### New in 5.0.0 (Released 2024/12/14)
+
+* Update to Cake 5.0 (@pascalberger)
+* Multi-Target .NET 8 & 9 (@pascalberger)
+* Update to LibGit2Sharp 0.30.0 (@pascalberger)
+* Add GitRemotes() and GitRemote() aliases (@ap0llo)
+
 ### New in 4.0.0 (Released 2024/03/07)
 
 * Update to Cake 4.0 (@pascalberger)
