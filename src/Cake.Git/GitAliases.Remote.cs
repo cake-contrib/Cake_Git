@@ -6,18 +6,19 @@ using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-// ReSharper disable UnusedMember.Global
 
+// ReSharper disable UnusedMember.Global
 namespace Cake.Git
 {
     public static partial class GitAliases
     {
         /// <summary>
-        /// Gets a git repository's remotes.
+        /// Gets a Git repository's remotes.
         /// </summary>
         /// <example>
         /// <code>
-        ///     var remotes = GitRemotes("c:/temp/cake");
+        ///     var remotes = GitRemotes("c:/myrepo");
+        ///     Information("Found remotes: {0}", string.Join(", ", remotes.Select(x => x.Name + " -> " + x.Url)));
         /// </code>
         /// </example>
         /// <param name="context">The context.</param>
@@ -29,15 +30,9 @@ namespace Cake.Git
         [CakeAliasCategory("Remotes")]
         public static IReadOnlyList<GitRemote> GitRemotes(this ICakeContext context, DirectoryPath repositoryDirectoryPath)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            ArgumentNullException.ThrowIfNull(context);
 
-            if (repositoryDirectoryPath == null)
-            {
-                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
-            }
+            ArgumentNullException.ThrowIfNull(repositoryDirectoryPath);
 
             if (!context.FileSystem.Exist(repositoryDirectoryPath))
             {
@@ -51,11 +46,12 @@ namespace Cake.Git
         }
 
         /// <summary>
-        /// Gets the specified remote from a git repository.
+        /// Gets the specified remote from a Git repository.
         /// </summary>
         /// <example>
         /// <code>
-        ///     var remotes = GitRemote("c:/temp/cake", "origin");
+        ///     GitRemote remote = GitRemote("c:/temp/cake", "origin");
+        ///     Information(remote.Url);
         /// </code>
         /// </example>
         /// <param name="context">The context.</param>
@@ -68,15 +64,9 @@ namespace Cake.Git
         [CakeAliasCategory("Remotes")]
         public static GitRemote GitRemote(this ICakeContext context, DirectoryPath repositoryDirectoryPath, string remoteName)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            ArgumentNullException.ThrowIfNull(context);
 
-            if (repositoryDirectoryPath == null)
-            {
-                throw new ArgumentNullException(nameof(repositoryDirectoryPath));
-            }
+            ArgumentNullException.ThrowIfNull(repositoryDirectoryPath);
 
             if (!context.FileSystem.Exist(repositoryDirectoryPath))
             {
