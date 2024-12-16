@@ -1,3 +1,7 @@
+### New in 5.0.1 (Released 2024/12/16)
+
+* Fix dependency versions for Cake.Frosting.Git (@pascalberger)
+
 ### New in 5.0.0 (Released 2024/12/14)
 
 * Update to Cake 5.0 (@pascalberger)
