@@ -11,6 +11,10 @@ jobs:
   build:
     name: Build
     runs-on: ${{ matrix.os }}
+    permissions:
+      # fly-ci needs those!
+      id-token: write
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -34,3 +38,8 @@ jobs:
           target: GitHubActions
           cake-version: tool-manifest
           verbosity: Diagnostic
+
+      # let's see what fly-ci magic can do for us...
+      - name: Fix my build
+        uses: fly-ci/wingman-action@v1
+        if: failure()
