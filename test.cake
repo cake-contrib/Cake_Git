@@ -45,8 +45,15 @@ Setup(ctx =>
 
     Information(buildStartMessage);
 
+try{
     GitSetLibGit2NativeLibraryPathToIncluded();
     GitEnableLogging();
+}
+catch (Exception e) {
+    Warning(e.Message);
+    Error(e);
+    throw e;
+}
 });
 
 Teardown(ctx =>

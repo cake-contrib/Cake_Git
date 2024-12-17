@@ -66,6 +66,10 @@ context.Log.Warning("Calculated the Cake.Git packaged libGit2 dlls to be in {0}"
             }
 
             GlobalSettings.NativeLibraryPath = nativeDllPath.FullPath;
+context.Log.Warning("GlobalSettings.NativeLibraryPath is now {0}", GlobalSettings.NativeLibraryPath);
+
+// the next line will cause the first load of the native libgit2
+context.Log.Warning("libgit2sharp Version: {0}", GlobalSettings.Version.ToString());
         }
 
         /// <summary>
