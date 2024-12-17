@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-latest, macos-13, windows-2019, windows-2022]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13, macos-14, macos-15, windows-2019, windows-2022]
     steps:
       - name: Get the sources
         uses: actions/checkout@v4
@@ -33,3 +33,4 @@ jobs:
         with:
           target: GitHubActions
           cake-version: tool-manifest
+          verbosity: Diagnostic
