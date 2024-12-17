@@ -14,17 +14,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-latest, macos-13, macos-14, windows-2019, windows-2022]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13, macos-14, macos-15, windows-2019, windows-2022]
     steps:
       - name: Get the sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install .NET Core SDK (global.json)
-        uses: actions/setup-dotnet@v1
+      - name: Install .NET SDK (global.json)
+        uses: actions/setup-dotnet@v4
         with:
-            include-prerelease: 'true'
+            global-json-file: 'global.json'
 
       - name: Run Cake script
         uses: cake-build/cake-action@v2
