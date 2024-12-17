@@ -3,6 +3,8 @@ using Cake.Core.Annotations;
 using Cake.Core.IO;
 using LibGit2Sharp;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Cake.Core.Diagnostics;
 using LogLevel = LibGit2Sharp.LogLevel;
@@ -67,6 +69,26 @@ context.Log.Warning("Calculated the Cake.Git packaged libGit2 dlls to be in {0}"
 
             GlobalSettings.NativeLibraryPath = nativeDllPath.FullPath;
 context.Log.Warning("GlobalSettings.NativeLibraryPath is now {0}", GlobalSettings.NativeLibraryPath);
+
+            var plf = typeof(GlobalSettings).Assembly.GetType("LibGit2Sharp.Core.Platform");
+            var isRunningOnFrameworkMethod = plf.GetMethod("IsRunningOnNetFramework", BindingFlags.Static | BindingFlags.Public);
+            context.Log.Warning("isRunningOnFramework: {0}", (bool)isRunningOnFrameworkMethod.Invoke(null, null));
+            
+            var isRunningOnNetCoreMethod = plf.GetMethod("IsRunningOnNetCore", BindingFlags.Static | BindingFlags.Public);
+            var isRunningOnNetCore = (bool)isRunningOnNetCoreMethod.Invoke(null, null);
+            context.Log.Warning("isRunningOnNetCore: {0}", isRunningOnNetCore);
+            
+            var nm = typeof(GlobalSettings).Assembly.GetType("LibGit2Sharp.Core.NativeMethods", true, true);
+            context.Log.Warning("nm: {0}", nm);
+            
+            var tryUseNativeLibMethod = nm.GetMethod("GetGlobalSettingsNativeLibraryPath", BindingFlags.Static | BindingFlags.NonPublic);
+            var tryUseNativeLib = (string)tryUseNativeLibMethod.Invoke(null, null);
+            context.Log.Warning("tryUseNativeLib: {0}", tryUseNativeLib);
+
+            var getGlobalSettingsNativeLibraryPathMethod = nm.GetMethod("TryUseNativeLibrary", BindingFlags.Static|BindingFlags.NonPublic);
+            var getGlobalSettingsNativeLibraryPath = (string)getGlobalSettingsNativeLibraryPathMethod.Invoke(null, null);
+            context.Log.Warning("getGlobalSettingsNativeLibraryPath: {0}", getGlobalSettingsNativeLibraryPath);
+            
 
 // the next line will cause the first load of the native libgit2
 context.Log.Warning("libgit2sharp Version: {0}", GlobalSettings.Version.ToString());
