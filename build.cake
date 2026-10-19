@@ -76,7 +76,7 @@ Setup(ctx =>
         isLocalBuild,
         configuration,
         target,
-        new[]{ "net10.0" },
+        new[]{ "net10.0", "net11.0" },
         new DotNetMSBuildSettings()
                             .WithProperty("Version", semVersion)
                             .WithProperty("AssemblyVersion", version)
