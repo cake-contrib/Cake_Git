@@ -76,7 +76,7 @@ Setup(ctx =>
         isLocalBuild,
         configuration,
         target,
-        new[]{ "net8.0", "net9.0" },
+        new[]{ "net8.0", "net9.0", "net10.0" },
         new DotNetMSBuildSettings()
                             .WithProperty("Version", semVersion)
                             .WithProperty("AssemblyVersion", version)
@@ -221,7 +221,7 @@ Task("Create-NuGet-Package-Scripting")
     var cakeGit = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/Cake.Git.dll");
     var cakeGitDoc = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/Cake.Git.xml");
     var libGit = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/**/LibGit2Sharp*");
-    var unmanaged = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/net8.0/runtimes/**/*");
+    var unmanaged = context.GetFiles(data.BuildPaths.ArtifactsRoot.FullPath + "/net10.0/runtimes/**/*");
 
     data.NuGetPackSettings.Description += Environment.NewLine + Environment.NewLine + 
                                           "NOTE:" + Environment.NewLine + 
@@ -286,7 +286,7 @@ Task("Create-NuGet-Package-Frosting")
                                     .ToArray();
     data.NuGetPackSettings.Dependencies = new List<NuSpecDependency>
     {
-        new NuSpecDependency { Id = "Cake.Core", Version = "5.0.0" },
+        new NuSpecDependency { Id = "Cake.Core", Version = "6.3.0" },
         new NuSpecDependency { Id = "LibGit2Sharp", Version = "0.30.0" }
     };
 
